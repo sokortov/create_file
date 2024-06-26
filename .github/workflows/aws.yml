@@ -25,7 +25,7 @@ jobs:
 
       - name: Run Python script
         run: |
-          python create_file.py /path/to/directory
+          python create_file.py path/to/directory
 
       - name: Upload to AWS S3
         env:
