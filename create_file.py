@@ -1,24 +1,30 @@
 import os
+import argparse
 
 def create_text_file(directory):
-    # Проверяем, существует ли папка, если нет - создаем
-    if not os.path.exists(directory):
-        os.makedirs(directory)
-        print(f"Папка {directory} была создана.")
-    else:
-        print(f"Папка {directory} уже существует.")
-    
-    # Путь к файлу
-    file_path = os.path.join(directory, "output.txt")
-    
-    # Записываем текст в файл
-    with open(file_path, "w") as file:
-        file.write("Hi hi hi!")
-    
-    print(f"Файл успешно создан и сохранен в {file_path}")
+    try:
+        # Создаем папку, если она не существует
+        os.makedirs(directory, exist_ok=True)
+        print(f"Папка {directory} была создана или уже существует.")
+        
+        # Путь к файлу
+        file_path = os.path.join(directory, "output.txt")
+        
+        # Записываем текст в файл
+        with open(file_path, "w") as file:
+            file.write("Hi hi hi!")
+        
+        print(f"Файл успешно создан и сохранен в {file_path}")
+    except Exception as e:
+        print(f"Произошла ошибка: {e}")
 
 if __name__ == "__main__":
-    # Запрашиваем у пользователя путь к папке
-    user_directory = input("Введите путь к папке: ")
-    create_text_file(user_directory)
-
+    # Настраиваем парсер аргументов командной строки
+    parser = argparse.ArgumentParser(description="Создание текстового файла с заданным содержимым в указанной папке.")
+    parser.add_argument("directory", type=str, help="Путь к папке, в которой будет создан файл.")
+    
+    # Парсим аргументы
+    args = parser.parse_args()
+    
+    # Вызываем функцию создания файла
+    create_text_file(args.directory)
