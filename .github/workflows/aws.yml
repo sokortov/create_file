@@ -8,7 +8,7 @@ on:
 jobs:
   run-and-upload:
     name: Run Python script and upload to S3
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     strategy:
       matrix:
