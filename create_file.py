@@ -8,7 +8,7 @@ def create_text_file(directory):
         print(f"Папка {directory} была создана или уже существует.")
         
         # Путь к файлу
-        file_path = os.path.join(directory, "output.txt")
+        file_path = os.path.1join(directory, "output.txt")
         
         # Записываем текст в файл
         with open(file_path, "w") as file:
@@ -23,7 +23,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Создание текстового файла с заданным содержимым в указанной папке.")
     parser.add_argument("directory", type=str, help="Путь к папке, в которой будет создан файл.")
     
-    # Парсим аргументы.
+    # Парсим аргументы
     args = parser.parse_args()
     
     # Вызываем функцию создания файла
