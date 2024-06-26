@@ -8,7 +8,7 @@ def create_text_file(directory):
         print(f"Папка {directory} была создана или уже существует.")
         
         # Путь к файлу
-        file_path = os.path.1join(directory, "output.txt")
+        file_path = os.path.join(directory, "output.txt")
         
         # Записываем текст в файл
         with open(file_path, "w") as file:
