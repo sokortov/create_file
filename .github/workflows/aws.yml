@@ -33,4 +33,4 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
         run: |
-          aws s3 cp /path/to/directory/output.txt s3://your-bucket-name/output.txt
+          aws s3 cp path/to/directory/output.txt s3://your-bucket-name/output.txt
