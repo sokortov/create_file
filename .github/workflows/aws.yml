@@ -6,7 +6,8 @@ on:
       - main  # или любая другая ветка, которую вы хотите отслеживать
 
 jobs:
-  run-script-and-upload:
+  debug-job:
+    name: Run in DEBUG mode and upload to S3
     runs-on: ubuntu-latest
 
     steps:
@@ -33,6 +34,23 @@ jobs:
           AWS_REGION: ${{ secrets.AWS_REGION }}
         run: |
           aws s3 cp path/to/directory/outDebug/outputDebug.txt s3://testbs23123/outDebug/outputDebug.txt
+
+  release-job:
+    name: Run in RELEASE mode and upload to S3
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'  # укажите нужную версию Python
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
 
       - name: Run Python script in RELEASE mode
         run: |
