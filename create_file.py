@@ -1,6 +1,5 @@
 import os
 import argparse
-import time
 
 def create_text_file(directory, mode):
     try:
@@ -23,7 +22,7 @@ def create_text_file(directory, mode):
         
         with open(file_path, "w") as file:
             file.write(content)
-        time.sleep(120)
+
         print(f"Файл успешно создан и сохранен в {file_path}")
     except Exception as e:
         print(f"Произошла ошибка: {e}")
