@@ -1,4 +1,4 @@
-name: Run Python script and upload to AWS
+name: Run Python script and upload to S3
 
 on:
   push:
@@ -21,16 +21,27 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install boto3  # Устанавливаем библиотеку для работы с AWS
 
-      - name: Run Python script
+      - name: Run Python script in DEBUG mode
         run: |
-          python create_file.py path/to/directory
+          python create_file.py path/to/directory DEBUG
 
-      - name: Upload to AWS S3
+      - name: Upload DEBUG file to S3
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
         run: |
-          aws s3 cp path/to/directory/output.txt s3://testbs23123/output.txt
+          aws s3 cp path/to/directory/outDebug/outputDebug.txt s3://testbs23123/outDebug/outputDebug.txt
+
+      - name: Run Python script in RELEASE mode
+        run: |
+          python create_file.py path/to/directory RELEASE
+
+      - name: Upload RELEASE file to S3
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+        run: |
+          aws s3 cp path/to/directory/outRelease/outputRelease.txt s3://testbs23123/outRelease/outputRelease.txt
