@@ -23,7 +23,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Создание текстового файла с заданным содержимым в указанной папке.")
     parser.add_argument("directory", type=str, help="Путь к папке, в которой будет создан файл.")
     
-    # Парсим аргументы
+    # Парсим аргументы.
     args = parser.parse_args()
     
     # Вызываем функцию создания файла
