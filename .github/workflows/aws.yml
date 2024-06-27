@@ -1,4 +1,4 @@
-name: Run Python script and upload to S3
+name: Build and upload to S3
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
       
 jobs:
   run-and-upload:
-    name: Run Python script and upload to S3
+    name: Build and upload to S3
     runs-on: self-hosted
 
     strategy:
@@ -16,16 +16,18 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2
 
-      - name: Run Python script upload to S3
+      - name: Build ${{ github.event.repository.name }} ${{ matrix.mode }}
         run: |
-          python create_file.py path/to/directory ${{ matrix.mode }}
+          python create_file.py REPO_NAME
           
       - name: Upload to S3
         run: |
-          aws s3 cp path/to/directory/out${{ matrix.mode }}/output${{ matrix.mode }}.txt s3://testbs23123/out${{ matrix.mode }}/output${{ matrix.mode }}.txt
+          aws s3 cp REPO_NAME s3://testbs23123/REPO_NAME
+          
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
+          REPO_NAME: ${{ github.event.repository.name }}/${{ matrix.mode }}
