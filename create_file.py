@@ -2,23 +2,23 @@ import os
 import argparse
 import subprocess
 
-def run_apt_update():
+def test_sudo():
     try:
-        subprocess.run(["sudo", "apt", "update"], check=True)
-        print("Обновление пакетов выполнено успешно.")
+        subprocess.run(["sudo", "ls"], check=True)
+        print("sudo works")
     except subprocess.CalledProcessError as e:
-        print(f"Ошибка при выполнении команды 'sudo apt update': {e}")
+        print(f"sudo error: {e}")
 
 def create_text_file(directory, mode):
     try:
         if mode == "DEBUG":
             directory = os.path.join(directory, "outDEBUG")
             file_name = "outputDEBUG.txt"
-            content = "Hi hi hi debug!"
+            content = "Hi hi hi 1 debug!"
         elif mode == "RELEASE":
             directory = os.path.join(directory, "outRELEASE")
             file_name = "outputRELEASE.txt"
-            content = "Hi hi hi release!"
+            content = "Hi hi hi 1 release!"
         else:
             print("Неверный режим. Используйте DEBUG или RELEASE.")
             return
