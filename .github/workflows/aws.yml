@@ -20,11 +20,11 @@ jobs:
 
       - name: Build ${{ github.event.repository.name }} ${{ matrix.mode }}
         run: |
-          python create_file.py REPO_NAME
+          python create_file.py ${{ REPO_NAME }}
           
       - name: Upload to S3
         run: |
-          aws s3 cp REPO_NAME s3://testbs23123/REPO_NAME
+          aws s3 cp ${{ REPO_NAME }} s3://testbs23123/${{ REPO_NAME }}
           
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
