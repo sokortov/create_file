@@ -17,7 +17,7 @@ jobs:
     env:
       PROJECT_NAME: ${{ github.event.repository.name }}
       MODE: ${{ matrix.mode }}
-      BUILD_REPO_NAME=${PROJECT_NAME}/${MODE}
+      BUILD_REPO_NAME=${{ env.PROJECT_NAME }}/${{ env.MODE }}
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_REGION: ${{ secrets.AWS_REGION }}
@@ -26,11 +26,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Build $PROJECT_NAME $MODE
+      - name: Build ${{ env.PROJECT_NAME }} ${{ env.MODE }}
         run: |
-          python create_file.py $BUILD_REPO_NAME $MODE
+          python create_file.py ${{ env.BUILD_REPO_NAME }} ${{ env.MODE }}
           
       - name: Upload to S3
         run: |
-          aws s3 cp $BUILD_REPO_NAME s3://testbs23123/${BUILD_REPO_NAME}
+          aws s3 cp ${{ env.BUILD_REPO_NAME }} s3://testbs23123/${{ env.BUILD_REPO_NAME }}
           
