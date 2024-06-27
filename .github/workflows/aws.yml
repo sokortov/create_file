@@ -14,7 +14,6 @@ jobs:
         
     env:
       PYTHON_VERSION: '3.12'
-      PYTHON_VERSION: '3.12'
       PROJECT_NAME: ${{ github.event.repository.name }}
       MODE: ${{ matrix.mode }}
       BUILD_REPO_NAME: ${{ github.event.repository.name }}/${{ matrix.mode }}
