@@ -43,7 +43,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     # Выполнение команды sudo apt update перед созданием файла
-    run_apt_update()
+    test_sudo()
     
     # Создание текстового файла
     create_text_file(args.directory, args.mode)
