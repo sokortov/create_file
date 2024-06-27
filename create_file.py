@@ -14,11 +14,11 @@ def create_text_file(directory, mode):
         if mode == "DEBUG":
             directory = os.path.join(directory, "outDEBUG")
             file_name = "outputDEBUG.txt"
-            content = "Hi hi hi 1 debug!"
+            content = "Hi hi hi debug!"
         elif mode == "RELEASE":
             directory = os.path.join(directory, "outRELEASE")
             file_name = "outputRELEASE.txt"
-            content = "Hi hi hi 1 release!"
+            content = "Hi hi hi release!"
         else:
             print("Неверный режим. Используйте DEBUG или RELEASE.")
             return
