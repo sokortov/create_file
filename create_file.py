@@ -1,5 +1,13 @@
 import os
 import argparse
+import subprocess
+
+def run_apt_update():
+    try:
+        subprocess.run(["sudo", "apt", "update"], check=True)
+        print("Обновление пакетов выполнено успешно.")
+    except subprocess.CalledProcessError as e:
+        print(f"Ошибка при выполнении команды 'sudo apt update': {e}")
 
 def create_text_file(directory, mode):
     try:
@@ -33,4 +41,9 @@ if __name__ == "__main__":
     parser.add_argument("mode", type=str, choices=["DEBUG", "RELEASE"], help="Режим работы: DEBUG или RELEASE.")
     
     args = parser.parse_args()
+    
+    # Выполнение команды sudo apt update перед созданием файла
+    run_apt_update()
+    
+    # Создание текстового файла
     create_text_file(args.directory, args.mode)
