@@ -27,7 +27,7 @@ jobs:
         uses: actions/checkout@v4
         
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           
@@ -38,7 +38,7 @@ jobs:
 
       - name: Build ${{ env.PROJECT_NAME }} ${{ env.MODE }}
         run: |
-          python create_file.py ${{ env.BUILD_REPO_NAME }} ${{ env.MODE }}
+          python build.py ${{ env.BUILD_REPO_NAME }} ${{ env.MODE }}
           
       - name: Upload to S3
         if: success()
@@ -47,4 +47,4 @@ jobs:
           
       - name: Cleaning up
         run: |
-          rm -r -f $(dirname ${{ env.BUILD_REPO_NAME }})
+          rm -r -f ${{ env.BUILD_REPO_NAME }}
