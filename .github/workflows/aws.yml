@@ -44,7 +44,7 @@ jobs:
         if: success()
         run: |
           zip -r ${{ env.BUILD_REPO_NAME }}.zip -j ${{ env.BUILD_REPO_NAME }}
-          aws s3 cp ${{ env.BUILD_REPO_NAME }}.zip s3://${{ env.AWS_BUCKET_NAME }}/${{ env.BUILD_REPO_NAME }} --region ${{ env.AWS_REGION }}
+          aws s3 cp ${{ env.BUILD_REPO_NAME }}.zip s3://${{ env.AWS_BUCKET_NAME }}/${{ env.BUILD_REPO_NAME }}.zip --region ${{ env.AWS_REGION }}
           
       - name: Cleaning up
         run: |
