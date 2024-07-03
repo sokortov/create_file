@@ -52,38 +52,38 @@ jobs:
           
       
       - name: List folders in S3 bucket and delete old ones
-      run: |
-        # Получаем список папок в S3
-        FOLDERS=$(aws s3 ls s3://${{ env.AWS_BUCKET_NAME }} --recursive | grep PRE | awk '{print $2}')
+        run: |
+          # Получаем список папок в S3
+          FOLDERS=$(aws s3 ls s3://${{ env.AWS_BUCKET_NAME }} --recursive | grep PRE | awk '{print $2}')
         
-        # Отладочный вывод для проверки содержимого
-        echo "Список папок:"
-        echo "$FOLDERS"
+          # Отладочный вывод для проверки содержимого
+          echo "Список папок:"
+          echo "$FOLDERS"
 
-        # Находим количество папок
-        TOTAL_FOLDERS=$(echo "$FOLDERS" | wc -l)
+          # Находим количество папок
+          TOTAL_FOLDERS=$(echo "$FOLDERS" | wc -l)
 
-        # Проверка количества папок
-        echo "Общее количество папок: $TOTAL_FOLDERS"
+          # Проверка количества папок
+          echo "Общее количество папок: $TOTAL_FOLDERS"
 
-        # Сколько папок нужно удалить
-        DELETE_COUNT=$(($TOTAL_FOLDERS - 12))
+          # Сколько папок нужно удалить
+          DELETE_COUNT=$(($TOTAL_FOLDERS - 12))
 
-        if [ $DELETE_COUNT -gt 0 ]; then
-          # Получаем папки, которые нужно удалить
-          FOLDERS_TO_DELETE=$(echo "$FOLDERS" | head -n $DELETE_COUNT)
+          if [ $DELETE_COUNT -gt 0 ]; then
+            # Получаем папки, которые нужно удалить
+            FOLDERS_TO_DELETE=$(echo "$FOLDERS" | head -n $DELETE_COUNT)
           
-          # Отладочный вывод для проверки папок на удаление
-          echo "Папки для удаления:"
-          echo "$FOLDERS_TO_DELETE"
+            # Отладочный вывод для проверки папок на удаление
+            echo "Папки для удаления:"
+            echo "$FOLDERS_TO_DELETE"
 
-          # Удаляем старые папки
-          for FOLDER in $FOLDERS_TO_DELETE; do
-            aws s3 rm s3://${{ env.AWS_BUCKET_NAME }}/$FOLDER --recursive
-          done
-        else
-          echo "Нет папок для удаления."
-        fi
+            # Удаляем старые папки
+            for FOLDER in $FOLDERS_TO_DELETE; do
+              aws s3 rm s3://${{ env.AWS_BUCKET_NAME }}/$FOLDER --recursive
+            done
+          else
+            echo "Нет папок для удаления."
+          fi
       
       - name: Cleaning up
         run: |
