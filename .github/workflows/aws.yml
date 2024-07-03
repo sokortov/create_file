@@ -52,12 +52,9 @@ jobs:
           aws s3 cp ${{ env.BUILD_REPO_NAME }}.zip s3://${{ env.AWS_BUCKET_NAME }}/${{ env.COMMIT_MESSAGE }}/${{ env.BUILD_REPO_NAME }}.zip --region ${{ env.AWS_REGION }}
         
       - name: List and delete old folders in S3 bucket
-        env:
-          BUCKET: your-bucket-name
-          PREFIX: path/to/builds/
         run: |
           # Получаем список всех объектов в папке и фильтруем только уникальные префиксы (папки)
-          FOLDERS=$(aws s3api list-objects-v2 --bucket $BUCKET --prefix $PREFIX --delimiter '/' --query 'CommonPrefixes[].Prefix' --output json | jq -r '.[]')
+          FOLDERS=$(aws s3api list-objects-v2 --bucket ${{ env.AWS_BUCKET_NAME }} --prefix ${{ env.PREFIX }} --delimiter '/' --query 'CommonPrefixes[].Prefix' --output json | jq -r '.[]')
         
           # Отладочный вывод для проверки содержимого
           echo "Список папок:"
@@ -82,7 +79,7 @@ jobs:
 
             # Удаляем старые папки
             for FOLDER in $FOLDERS_TO_DELETE; do
-              aws s3 rm s3://$BUCKET/$FOLDER --recursive
+              aws s3 rm s3://${{ env.AWS_BUCKET_NAME }}/$FOLDER --recursive
             done
           else
             echo "Нет папок для удаления."
