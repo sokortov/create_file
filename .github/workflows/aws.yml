@@ -52,4 +52,4 @@ jobs:
           
       - name: Cleaning up
         run: |
-          rm -r -f ${{ env.BUILD_REPO_NAME }} 
+          rm -r -f ${{ env.BUILD_REPO_NAME }}
