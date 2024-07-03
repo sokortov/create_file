@@ -50,11 +50,13 @@ jobs:
         run: |
           zip -r ${{ env.BUILD_REPO_NAME }}.zip -j ${{ env.BUILD_REPO_NAME }}
           aws s3 cp ${{ env.BUILD_REPO_NAME }}.zip s3://${{ env.AWS_BUCKET_NAME }}/${{ env.COMMIT_MESSAGE }}/${{ env.BUILD_REPO_NAME }}.zip --region ${{ env.AWS_REGION }}
-        
+
       - name: List and delete old folders in S3 bucket
+        env:
+          BUCKET: your-bucket-name
         run: |
-          # Получаем список всех объектов в папке и фильтруем только уникальные префиксы (папки)
-          FOLDERS=$(aws s3api list-objects-v2 --bucket ${{ env.AWS_BUCKET_NAME }} --prefix ${{ env.PREFIX }} --delimiter '/' --query 'CommonPrefixes[].Prefix' --output json | jq -r '.[]')
+          # Получаем список всех объектов в бакете и фильтруем только уникальные префиксы (папки)
+          FOLDERS=$(aws s3api list-objects-v2 --bucket ${{ env.AWS_BUCKET_NAME }} --delimiter '/' --query 'CommonPrefixes[].Prefix' --output json | jq -r '.[]')
         
           # Отладочный вывод для проверки содержимого
           echo "Список папок:"
@@ -62,10 +64,10 @@ jobs:
 
           # Подсчитываем количество папок
           TOTAL_FOLDERS=$(echo "$FOLDERS" | wc -l)
- 
+
           # Проверка количества папок
           echo "Общее количество папок: $TOTAL_FOLDERS"
-
+ 
           # Сколько папок нужно удалить
           DELETE_COUNT=$(($TOTAL_FOLDERS - 5))
 
@@ -84,7 +86,7 @@ jobs:
           else
             echo "Нет папок для удаления."
           fi
-      
+  
       - name: Cleaning up
         run: |
           rm -r -f ${{ env.BUILD_REPO_NAME }}
