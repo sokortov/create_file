@@ -57,7 +57,7 @@ jobs:
           PREFIX: path/to/builds/
         run: |
           # Получаем список всех объектов в папке и фильтруем только уникальные префиксы (папки)
-          FOLDERS=$(aws s3api list-objects-v2 --bucket $BUCKET --prefix $PREFIX --delimiter '/' --query "CommonPrefixes[].Prefix" --output text)
+          FOLDERS=$(aws s3api list-objects-v2 --bucket ${{ env.AWS_BUCKET_NAME }} --prefix ${{ env.PREFIX }} --delimiter '/' --query "CommonPrefixes[].Prefix" --output text)
         
           # Отладочный вывод для проверки содержимого
           echo "Список папок:"
@@ -70,7 +70,7 @@ jobs:
           echo "Общее количество папок: $TOTAL_FOLDERS"
 
           # Сколько папок нужно удалить
-          DELETE_COUNT=$(($TOTAL_FOLDERS - 5))
+          DELETE_COUNT=$(($TOTAL_FOLDERS - 15))
 
           if [ $DELETE_COUNT -gt 0 ]; then
             # Получаем папки, которые нужно удалить
@@ -82,7 +82,7 @@ jobs:
 
             # Удаляем старые папки
             for FOLDER in $FOLDERS_TO_DELETE; do
-              aws s3 rm s3://$BUCKET/$FOLDER --recursive
+              aws s3 rm s3://${{ env.AWS_BUCKET_NAME }}/$FOLDER --recursive
             done
           else
             echo "Нет папок для удаления."
