@@ -21,6 +21,7 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_REGION: ${{ secrets.AWS_REGION }}
+      PREFIX: ''
       
     steps:
       - name: Checkout repository
@@ -54,7 +55,7 @@ jobs:
       - name: List folders in S3 bucket and delete old ones
         run: |
           # Получаем список папок в S3
-          FOLDERS=$(aws s3 ls s3://$AWS_BUCKET_NAME --recursive | grep PRE | awk '{print $2}')
+          FOLDERS=$(aws s3 ls s3://$AWS_BUCKET_NAME/$PREFIX --recursive | grep PRE | awk '{print $2}')
         
           # Отладочный вывод для проверки содержимого
           echo "Список папок:"
