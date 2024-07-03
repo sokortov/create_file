@@ -51,46 +51,54 @@ jobs:
           zip -r ${{ env.BUILD_REPO_NAME }}.zip -j ${{ env.BUILD_REPO_NAME }}
           aws s3 cp ${{ env.BUILD_REPO_NAME }}.zip s3://${{ env.AWS_BUCKET_NAME }}/${{ env.COMMIT_MESSAGE }}/${{ env.BUILD_REPO_NAME }}.zip --region ${{ env.AWS_REGION }}
 
-
       - name: List and delete old folders in S3 bucket
         env:
           BUCKET: your-bucket-name
         run: |
           # Получаем список всех объектов в бакете с датами последнего изменения
-          OBJECTS=$(aws s3api list-objects-v2 --bucket ${{ env.AWS_BUCKET_NAME }} --query "Contents[].{Key: Key, LastModified: LastModified}" --output json)
+          OBJECTS=$(aws s3api list-objects-v2 --bucket $BUCKET --query "Contents[].{Key: Key, LastModified: LastModified}" --output json)
         
-          # Преобразуем JSON в список папок с датами последнего изменения
-          FOLDERS=$(echo $OBJECTS | jq -r '.[] | select(.Key | contains("/")) | {Key: .Key, Date: (.LastModified | fromdateiso8601)} | .Key |= split("/")[0] | .Key + " " + (.Date | tostring)' | sort -k2)
+          # Извлекаем список папок из объектов, содержащих "/"
+          FOLDERS=$(echo "$OBJECTS" | jq -r '.[].Key | select(contains("/")) | split("/")[0] | unique')
 
+          # Получаем список папок с датами последнего изменения
+          FOLDERS_WITH_DATES=$(for FOLDER in $FOLDERS; do
+                                  LAST_MODIFIED=$(aws s3api list-objects-v2 --bucket $BUCKET --prefix "${FOLDER}/" --query "Contents[?ends_with(Key, '/')] | [0].LastModified" --output text)
+                                  echo "$FOLDER $LAST_MODIFIED"
+                              done)
+
+          # Сортируем папки по дате последнего изменения (самые старые первые)
+          SORTED_FOLDERS=$(echo "$FOLDERS_WITH_DATES" | sort -k2)
+ 
           # Отладочный вывод для проверки содержимого
           echo "Список папок с датами последнего изменения:"
-          echo "$FOLDERS"
+          echo "$SORTED_FOLDERS"
 
           # Подсчитываем количество уникальных папок
-          TOTAL_FOLDERS=$(echo "$FOLDERS" | awk '{print $1}' | uniq | wc -l)
+          TOTAL_FOLDERS=$(echo "$SORTED_FOLDERS" | wc -l)
 
           # Проверка количества папок
           echo "Общее количество папок: $TOTAL_FOLDERS"
-
+  
           # Сколько папок нужно удалить
           DELETE_COUNT=$(($TOTAL_FOLDERS - 5))
 
           if [ $DELETE_COUNT -gt 0 ]; then
             # Получаем папки, которые нужно удалить
-            FOLDERS_TO_DELETE=$(echo "$FOLDERS" | awk '{print $1}' | uniq | head -n $DELETE_COUNT)
+            FOLDERS_TO_DELETE=$(echo "$SORTED_FOLDERS" | head -n $DELETE_COUNT | awk '{print $1}')
           
             # Отладочный вывод для проверки папок на удаление
             echo "Папки для удаления:"
             echo "$FOLDERS_TO_DELETE"
-
+ 
             # Удаляем старые папки
             for FOLDER in $FOLDERS_TO_DELETE; do
-              aws s3 rm s3://${{ env.AWS_BUCKET_NAME }}/$FOLDER --recursive
+              aws s3 rm s3://$BUCKET/$FOLDER --recursive
             done
           else
             echo "Нет папок для удаления."
           fi
-
+          
       - name: Cleaning up
         run: |
           rm -r -f ${{ env.BUILD_REPO_NAME }}
