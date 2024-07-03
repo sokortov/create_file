@@ -56,14 +56,14 @@ jobs:
           BUCKET: your-bucket-name
         run: |
           # Получаем список всех объектов в бакете с датами последнего изменения
-          OBJECTS=$(aws s3api list-objects-v2 --bucket $BUCKET --query "Contents[].{Key: Key, LastModified: LastModified}" --output json)
+          OBJECTS=$(aws s3api list-objects-v2 --bucket ${{ env.AWS_BUCKET_NAME }} --query "Contents[].{Key: Key, LastModified: LastModified}" --output json)
         
           # Извлекаем список папок из объектов, содержащих "/"
           FOLDERS=$(echo "$OBJECTS" | jq -r '.[].Key | select(contains("/")) | split("/")[0] | unique')
 
           # Получаем список папок с датами последнего изменения
           FOLDERS_WITH_DATES=$(for FOLDER in $FOLDERS; do
-                                  LAST_MODIFIED=$(aws s3api list-objects-v2 --bucket $BUCKET --prefix "${FOLDER}/" --query "Contents[?ends_with(Key, '/')] | [0].LastModified" --output text)
+                                  LAST_MODIFIED=$(aws s3api list-objects-v2 --bucket ${{ env.AWS_BUCKET_NAME }} --prefix "${FOLDER}/" --query "Contents[?ends_with(Key, '/')] | [0].LastModified" --output text)
                                   echo "$FOLDER $LAST_MODIFIED"
                               done)
 
@@ -93,7 +93,7 @@ jobs:
  
             # Удаляем старые папки
             for FOLDER in $FOLDERS_TO_DELETE; do
-              aws s3 rm s3://$BUCKET/$FOLDER --recursive
+              aws s3 rm s3://${{ env.AWS_BUCKET_NAME }}/$FOLDER --recursive
             done
           else
             echo "Нет папок для удаления."
