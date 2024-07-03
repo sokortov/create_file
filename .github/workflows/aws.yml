@@ -21,6 +21,7 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_REGION: ${{ secrets.AWS_REGION }}
+      PREFIX: 'testbs23123'
       
     steps:
       - name: Checkout repository
@@ -50,6 +51,30 @@ jobs:
           zip -r ${{ env.BUILD_REPO_NAME }}.zip -j ${{ env.BUILD_REPO_NAME }}
           aws s3 cp ${{ env.BUILD_REPO_NAME }}.zip s3://${{ env.AWS_BUCKET_NAME }}/${{ env.COMMIT_MESSAGE }}/${{ env.BUILD_REPO_NAME }}.zip --region ${{ env.AWS_REGION }}
           
+      
+      - name: List folders in S3 bucket and delete old ones
+        run: |
+          # Получаем список папок в S3 и сортируем их по дате создания
+          FOLDERS=$(aws s3api list-objects-v2 --bucket ${{ env.AWS_BUCKET_NAME }} --prefix ${{ env.PREFIX }} --delimiter '/' --query "CommonPrefixes[].Prefix" --output text | sort)
+
+          # Находим количество папок
+          TOTAL_FOLDERS=$(echo "$FOLDERS" | wc -l)
+        
+          # Сколько папок нужно удалить
+          DELETE_COUNT=$(($TOTAL_FOLDERS - 12))
+
+          if [ $DELETE_COUNT -gt 0 ]; then
+            # Получаем папки, которые нужно удалить
+            FOLDERS_TO_DELETE=$(echo "$FOLDERS" | head -n $DELETE_COUNT)
+          
+            # Удаляем старые папки
+            for FOLDER in $FOLDERS_TO_DELETE; do
+              aws s3 rm s3://${{ env.AWS_BUCKET_NAME }}/$FOLDER --recursive
+            done
+          else
+            echo "Нет папок для удаления."
+          fi
+      
       - name: Cleaning up
         run: |
           rm -r -f ${{ env.BUILD_REPO_NAME }}
