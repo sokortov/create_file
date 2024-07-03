@@ -55,7 +55,7 @@ jobs:
       - name: List folders in S3 bucket and delete old ones
         run: |
           # Получаем список папок в S3
-          FOLDERS=$(aws s3 ls s3://$AWS_BUCKET_NAME/$PREFIX --recursive | grep PRE | awk '{print $2}')
+          FOLDERS=$(aws s3 ls s3://${{ env.AWS_BUCKET_NAME }}/${{ env.PREFIX }} --recursive | grep PRE | awk '{print $2}')
         
           # Отладочный вывод для проверки содержимого
           echo "Список папок:"
