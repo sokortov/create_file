@@ -60,8 +60,8 @@ jobs:
           OBJECTS=$(aws s3api list-objects-v2 --bucket ${{ env.AWS_BUCKET_NAME }} --query "Contents[].{Key: Key, LastModified: LastModified}" --output json)
         
           # Преобразуем JSON в список папок с датами последнего изменения
-          FOLDERS=$(echo $OBJECTS | jq -r '.[] | select(.Key | contains("/")) | {Key: .Key, Date: .LastModified | fromdate} | .Key |= split("/")[0] | .Key + " " + (.Date | tostring)' | sort -k2)
-        
+          FOLDERS=$(echo $OBJECTS | jq -r '.[] | select(.Key | contains("/")) | {Key: .Key, Date: (.LastModified | fromdateiso8601)} | .Key |= split("/")[0] | .Key + " " + (.Date | tostring)' | sort -k2)
+
           # Отладочный вывод для проверки содержимого
           echo "Список папок с датами последнего изменения:"
           echo "$FOLDERS"
