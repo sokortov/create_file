@@ -51,12 +51,23 @@ jobs:
           zip -r ${{ env.BUILD_REPO_NAME }}.zip -j ${{ env.BUILD_REPO_NAME }}
           aws s3 cp ${{ env.BUILD_REPO_NAME }}.zip s3://${{ env.AWS_BUCKET_NAME }}/${{ env.COMMIT_MESSAGE }}/${{ env.BUILD_REPO_NAME }}.zip --region ${{ env.AWS_REGION }}
           
-            
+        
       - name: List and delete old folders in S3 bucket
         run: |
-          # Получаем список всех папок в бакете с датами последнего изменения
-          aws s3 ls s3://${{ env.AWS_BUCKET_NAME }} --recursive | awk '{print $1" "$2" "$4}' | grep '/$' > folders.txt || true
+          # Получаем список всех объектов в бакете
+          echo "Получаем список всех объектов в бакете:"
+          aws s3 ls s3://${{ env.AWS_BUCKET_NAME }}/ --recursive
           
+          # Сохраняем список всех объектов в файл
+          aws s3 ls s3://${{ env.AWS_BUCKET_NAME }}/ --recursive > objects.txt
+          
+          # Отладочный вывод для проверки содержимого
+          echo "Содержимое файла objects.txt:"
+          cat objects.txt
+
+          # Получаем список папок с датами последнего изменения
+          grep '/$' objects.txt | awk '{print $1" "$2" "$4}' > folders.txt || true
+
           # Отладочный вывод для проверки содержимого
           echo "Список папок с датами последнего изменения:"
           cat folders.txt
@@ -85,7 +96,8 @@ jobs:
           else
             echo "Нет папок для удаления."
           fi
-            
+
+              
       - name: Cleaning up
         run: |
           rm -r -f ${{ env.BUILD_REPO_NAME }}
