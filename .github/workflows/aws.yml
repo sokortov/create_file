@@ -65,11 +65,11 @@ jobs:
           echo "Содержимое файла objects.txt:"
           cat objects.txt
 
-          # Получаем список папок с датами последнего изменения
-          awk '{print $1" "$2" "$4}' objects.txt | grep -o '^[^ ]*' | sort | uniq > folders.txt || true
+          # Получаем список папок
+          awk -F' ' '{print $4}' objects.txt | grep -o '^[0-9]*/' | sort | uniq > folders.txt
 
           # Отладочный вывод для проверки содержимого
-          echo "Список папок с датами последнего изменения:"
+          echo "Список папок:"
           cat folders.txt
 
           # Подсчитываем количество уникальных папок
@@ -96,7 +96,7 @@ jobs:
           else
             echo "Нет папок для удаления."
           fi
-                
+
       - name: Cleaning up
         run: |
           rm -r -f ${{ env.BUILD_REPO_NAME }}
