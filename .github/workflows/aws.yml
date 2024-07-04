@@ -51,7 +51,7 @@ jobs:
           zip -r ${{ env.BUILD_REPO_NAME }}.zip -j ${{ env.BUILD_REPO_NAME }}
           aws s3 cp ${{ env.BUILD_REPO_NAME }}.zip s3://${{ env.AWS_BUCKET_NAME }}/${{ env.COMMIT_MESSAGE }}/${{ env.BUILD_REPO_NAME }}.zip --region ${{ env.AWS_REGION }}
           
-        
+
       - name: List and delete old folders in S3 bucket
         run: |
           # Получаем список всех объектов в бакете
@@ -66,14 +66,14 @@ jobs:
           cat objects.txt
 
           # Получаем список папок с датами последнего изменения
-          grep '/$' objects.txt | awk '{print $1" "$2" "$4}' > folders.txt || true
+          awk '{print $1" "$2" "$4}' objects.txt | grep -o '^[^ ]*' | sort | uniq > folders.txt || true
 
           # Отладочный вывод для проверки содержимого
           echo "Список папок с датами последнего изменения:"
           cat folders.txt
 
           # Подсчитываем количество уникальных папок
-          TOTAL_FOLDERS=$(cat folders.txt | awk '{print $3}' | sort | uniq | wc -l)
+          TOTAL_FOLDERS=$(cat folders.txt | wc -l)
           echo "Общее количество папок: $TOTAL_FOLDERS"
 
           # Сколько папок нужно удалить
@@ -82,7 +82,7 @@ jobs:
 
           if [ $DELETE_COUNT -gt 0 ]; then
             # Получаем папки, которые нужно удалить
-            FOLDERS_TO_DELETE=$(cat folders.txt | sort | awk '{print $3}' | uniq | head -n $DELETE_COUNT)
+            FOLDERS_TO_DELETE=$(cat folders.txt | head -n $DELETE_COUNT)
             
             # Отладочный вывод для проверки папок на удаление
             echo "Папки для удаления:"
@@ -96,8 +96,7 @@ jobs:
           else
             echo "Нет папок для удаления."
           fi
-
-              
+                
       - name: Cleaning up
         run: |
           rm -r -f ${{ env.BUILD_REPO_NAME }}
