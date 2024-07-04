@@ -52,8 +52,6 @@ jobs:
           aws s3 cp ${{ env.BUILD_REPO_NAME }}.zip s3://${{ env.AWS_BUCKET_NAME }}/${{ env.COMMIT_MESSAGE }}/${{ env.BUILD_REPO_NAME }}.zip --region ${{ env.AWS_REGION }}
 
       - name: List and delete old folders in S3 bucket
-        env:
-          BUCKET: your-bucket-name
         run: |
           # Получаем список всех объектов в бакете с датами последнего изменения
           OBJECTS=$(aws s3api list-objects-v2 --bucket ${{ env.AWS_BUCKET_NAME }} --query "Contents[].{Key: Key, LastModified: LastModified}" --output json)
