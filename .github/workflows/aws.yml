@@ -86,7 +86,6 @@ jobs:
             echo "Нет папок для удаления."
           fi
             
-          
       - name: Cleaning up
         run: |
           rm -r -f ${{ env.BUILD_REPO_NAME }}
