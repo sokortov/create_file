@@ -50,7 +50,7 @@ jobs:
         run: |
           zip -r ${{ env.BUILD_REPO_NAME }}.zip -j ${{ env.BUILD_REPO_NAME }}
           aws s3 cp ${{ env.BUILD_REPO_NAME }}.zip s3://${{ env.AWS_BUCKET_NAME }}/${{ env.COMMIT_MESSAGE }}/${{ env.BUILD_REPO_NAME }}.zip --region ${{ env.AWS_REGION }}
-          
+           
 
       - name: List and delete old folders in S3 bucket
         run: |
