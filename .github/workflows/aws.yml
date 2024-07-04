@@ -53,8 +53,6 @@ jobs:
           
             
       - name: List and delete old folders in S3 bucket
-        env:
-          AWS_BUCKET_NAME: your-bucket-name
         run: |
           # Получаем список всех папок в бакете с датами последнего изменения
           aws s3 ls s3://${{ env.AWS_BUCKET_NAME }}/ --recursive | awk '{print $1" "$2" "$4}' | grep '/$' > folders.txt || true
