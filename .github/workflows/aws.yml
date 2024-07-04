@@ -65,9 +65,9 @@ jobs:
           echo "Содержимое файла objects.txt:"
           cat objects.txt
 
-          # Получаем список папок
-          awk -F' ' '{print $4}' objects.txt | grep -o '^[0-9]*/' | sort | uniq > folders.txt
-
+          # Получаем список уникальных папок
+          awk '{print $2}' objects.txt | sort | uniq | grep -oE '[0-9]+' > folders.txt
+          
           # Отладочный вывод для проверки содержимого
           echo "Список папок:"
           cat folders.txt
@@ -96,7 +96,8 @@ jobs:
           else
             echo "Нет папок для удаления."
           fi
-
+          
+        
       - name: Cleaning up
         run: |
           rm -r -f ${{ env.BUILD_REPO_NAME }}
