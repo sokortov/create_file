@@ -65,4 +65,4 @@ jobs:
             aws s3 ls s3://${{ env.AWS_BUCKET_NAME }}/${{ github.event.repository.name }}/$folder --recursive | grep -v "PRE" | sort -r | tail -n +3 | awk '{print $4}' | while read -r old_folder; do
               aws s3 rm s3://${{ env.AWS_BUCKET_NAME }}/${{ github.event.repository.name }}/$old_folder --recursive
             done
-          done
+          done 
