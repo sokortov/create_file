@@ -68,4 +68,4 @@ jobs:
               aws s3 rm s3://${{ env.AWS_BUCKET_NAME }}/$folder --recursive
             fi
             counter=$((counter + 1))
-          done
+          done 
