@@ -59,7 +59,7 @@ jobs:
           rm -r -f ${{ env.BUILD_REPO_NAME }}
           
       - name: Clean old builds from S3
-        if: success()
+        if: success() 
         run: |
           aws s3 ls s3://${{ env.AWS_BUCKET_NAME }}/${{ github.event.repository.name }}/ | grep PRE | awk '{print $2}' | sort -r | tail -n +3 | while read -r folder; do
             aws s3 rm s3://${{ env.AWS_BUCKET_NAME }}/${{ github.event.repository.name }}/$folder --recursive
