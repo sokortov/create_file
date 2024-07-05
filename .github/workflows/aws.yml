@@ -57,21 +57,22 @@ jobs:
       - name: Cleaning up
         run: |
           rm -r -f ${{ env.BUILD_REPO_NAME }}
-          
+
       - name: Clean old builds from S3
         if: success()
         run: |
           echo "Listing all folders in s3://${{ env.AWS_BUCKET_NAME }}/${{ env.PROJECT_NAME }}/"
-          folders=$(aws s3api list-objects-v2 --bucket ${{ env.AWS_BUCKET_NAME }} --prefix ${{ env.PROJECT_NAME }}/ --query "Contents[].[Key, LastModified]" --output text | grep '/$' | sort -k2,2 | awk '{print $1}')
+          folders=$(aws s3api list-objects-v2 --bucket ${{ env.AWS_BUCKET_NAME }} --prefix ${{ env.PROJECT_NAME }}/ --delimiter '/' --query 'CommonPrefixes[*].Prefix' --output text)
           echo "All folders: $folders"
-          counter=0
-          for folder in $folders; do
-            if [ $counter -ge 2 ]; then
-              echo "Deleting folder: $folder"
-              aws s3 rm s3://${{ env.AWS_BUCKET_NAME }}/$folder --recursive
-            fi
-            counter=$((counter + 1))
-          done
-          if [ $counter -lt 2 ]; then
-            echo "Less than 2 folders found, no folders deleted"
+          folder_array=($folders)
+          echo "Total folders: ${#folder_array[@]}"
+          if [ ${#folder_array[@]} -le 2 ]; then
+            echo "Less than 3 folders found, no folders deleted"
+            exit 0
           fi
+          folders_to_delete=$(aws s3api list-objects-v2 --bucket ${{ env.AWS_BUCKET_NAME }} --prefix ${{ env.PROJECT_NAME }}/ --delimiter '/' --query 'CommonPrefixes[2:].Prefix' --output text)
+          echo "Folders to delete: $folders_to_delete"
+          for folder in $folders_to_delete; do
+            echo "Deleting folder: $folder"
+            aws s3 rm s3://${{ env.AWS_BUCKET_NAME }}/$folder --recursive
+          done
