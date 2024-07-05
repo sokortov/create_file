@@ -62,9 +62,10 @@ jobs:
         if: success()
         run: |
           echo "Listing all folders in s3://${{ env.AWS_BUCKET_NAME }}/${{ env.PROJECT_NAME }}/"
-          json_output=$(aws s3api list-objects-v2 --bucket ${{ env.AWS_BUCKET_NAME }} --prefix ${{ env.PROJECT_NAME }}/ --delimiter '/')
-          echo "JSON output: $json_output"
-          folders=$(echo $json_output | jq -r '.CommonPrefixes[] | select(.Prefix | test("/$")) | {Prefix: .Prefix, LastModified: (.Prefix | sub("/$"; "") | sub("^.*[^/]"; "") | . + "/")}' | jq -s 'sort_by(.LastModified) | .[] | .Prefix')
+          folder_list=$(aws s3 ls s3://${{ env.AWS_BUCKET_NAME }}/${{ env.PROJECT_NAME }}/ --recursive | grep "/$" | awk '{print $1 " " $2 " " $4}')
+          echo "Folder list with dates:"
+          echo "$folder_list"
+          folders=$(echo "$folder_list" | sort -k1,1 -k2,2 | awk '{print $3}')
           echo "All folders sorted by date: $folders"
           folder_array=($folders)
           echo "Total folders: ${#folder_array[@]}"
@@ -76,5 +77,5 @@ jobs:
           echo "Folders to delete: ${folders_to_delete[@]}"
           for folder in "${folders_to_delete[@]}"; do
             echo "Deleting folder: $folder"
-            aws s3 rm s3://${{ env.AWS_BUCKET_NAME }}/$folder --recursive
+            aws s3 rm s3://${{ env.AWS_BUCKET_NAME }}/${{ env.PROJECT_NAME }}/$folder --recursive
           done
