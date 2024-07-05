@@ -62,17 +62,19 @@ jobs:
         if: success()
         run: |
           echo "Listing all folders in s3://${{ env.AWS_BUCKET_NAME }}/${{ env.PROJECT_NAME }}/"
-          folders=$(aws s3api list-objects-v2 --bucket ${{ env.AWS_BUCKET_NAME }} --prefix ${{ env.PROJECT_NAME }}/ --delimiter '/' --query 'CommonPrefixes[*].Prefix' --output text)
-          echo "All folders: $folders"
+          json_output=$(aws s3api list-objects-v2 --bucket ${{ env.AWS_BUCKET_NAME }} --prefix ${{ env.PROJECT_NAME }}/ --delimiter '/')
+          echo "JSON output: $json_output"
+          folders=$(echo $json_output | jq -r '.CommonPrefixes[] | select(.Prefix | test("/$")) | {Prefix: .Prefix, LastModified: (.Prefix | sub("/$"; "") | sub("^.*[^/]"; "") | . + "/")}' | jq -s 'sort_by(.LastModified) | .[] | .Prefix')
+          echo "All folders sorted by date: $folders"
           folder_array=($folders)
           echo "Total folders: ${#folder_array[@]}"
           if [ ${#folder_array[@]} -le 2 ]; then
             echo "Less than 3 folders found, no folders deleted"
             exit 0
           fi
-          folders_to_delete=$(aws s3api list-objects-v2 --bucket ${{ env.AWS_BUCKET_NAME }} --prefix ${{ env.PROJECT_NAME }}/ --delimiter '/' --query 'CommonPrefixes[2:].Prefix' --output text)
-          echo "Folders to delete: $folders_to_delete"
-          for folder in $folders_to_delete; do
+          folders_to_delete=("${folder_array[@]:0:${#folder_array[@]}-2}")
+          echo "Folders to delete: ${folders_to_delete[@]}"
+          for folder in "${folders_to_delete[@]}"; do
             echo "Deleting folder: $folder"
             aws s3 rm s3://${{ env.AWS_BUCKET_NAME }}/$folder --recursive
           done
