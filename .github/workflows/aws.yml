@@ -66,21 +66,29 @@ jobs:
           folder_list=$(aws s3api list-objects-v2 --bucket ${{ env.AWS_BUCKET_NAME }} --prefix ${{ env.PROJECT_NAME }}/ --delimiter '/' --query 'CommonPrefixes[*].Prefix' --output text)
           echo "Folder list:"
           echo "$folder_list"
+          
+          # Получаем и сортируем список папок по дате
           folders_with_dates=$(for folder in $folder_list; do echo "$(aws s3 ls s3://${{ env.AWS_BUCKET_NAME }}/$folder --recursive | sort | tail -n 1) $folder"; done)
           echo "Folders with dates:"
           echo "$folders_with_dates"
-          sorted_folders=$(echo "$folders_with_dates" | sort | awk '{print $4}')
+          
+          # Сортировка по дате
+          sorted_folders=$(echo "$folders_with_dates" | sort | awk '{print $NF}')
           echo "All folders sorted by date:"
           echo "$sorted_folders"
+          
           folder_array=($sorted_folders)
           echo "Total folders: ${#folder_array[@]}"
+          
           if [ ${#folder_array[@]} -le 2 ]; then
             echo "Less than 3 folders found, no folders deleted"
             exit 0
           fi
+          
           folders_to_delete=("${folder_array[@]:0:${#folder_array[@]}-2}")
           echo "Folders to delete: ${folders_to_delete[@]}"
+          
           for folder in "${folders_to_delete[@]}"; do
             echo "Deleting folder: $folder"
-            aws s3 rm s3://${{ env.AWS_BUCKET_NAME }}/$folder --recursive
+            aws s3 rm "s3://${{ env.AWS_BUCKET_NAME }}/$folder" --recursive
           done
