@@ -46,56 +46,13 @@ jobs:
         run: echo "COMMIT_MESSAGE=$(git log -1 --pretty=%B)" >> $GITHUB_ENV
       
       - name: Upload to S3
+          env:
+            UPLOAD_REPO_NAME: ${{ github.event.repository.name }}/${{ env.COMMIT_MESSAGE }}/${{ matrix.mode }}
+
         if: success()
         run: |
           zip -r ${{ env.BUILD_REPO_NAME }}.zip -j ${{ env.BUILD_REPO_NAME }}
-          aws s3 cp ${{ env.BUILD_REPO_NAME }}.zip s3://${{ env.AWS_BUCKET_NAME }}/${{ env.COMMIT_MESSAGE }}/${{ env.BUILD_REPO_NAME }}.zip --region ${{ env.AWS_REGION }}
-             
-
-      - name: List and delete old folders in S3 bucket
-        run: |
-          # Получаем  список всех объектов в бакете
-          echo "Получаем список всех объектов в бакете:"
-          aws s3 ls s3://${{ env.AWS_BUCKET_NAME }}/ --recursive
-          
-          # Сохраняем список всех объектов в файл
-          aws s3 ls s3://${{ env.AWS_BUCKET_NAME }}/ --recursive > objects.txt
-          
-          # Отладочный вывод для проверки содержимого
-          echo "Содержимое файла objects.txt:"
-          cat objects.txt
-
-          # Получаем список всех папок в бакете (все, кроме файлов)
-          awk '/\// {print $NF}' objects.txt | sort | uniq > folders.txt
-          
-          # Отладочный вывод для проверки содержимого
-          echo "Список папок:"
-          cat folders.txt
-
-          # Подсчитываем количество всех папок
-          TOTAL_FOLDERS=$(cat folders.txt | wc -l)
-          echo "Общее количество папок: $TOTAL_FOLDERS"
-
-          # Сколько папок нужно удалить (оставляем только 5 самых новых)
-          DELETE_COUNT=$(($TOTAL_FOLDERS - 5))
-          echo "Папок для удаления: $DELETE_COUNT"
-
-          if [ $DELETE_COUNT -gt 0 ]; then
-            # Получаем папки, которые нужно удалить
-            FOLDERS_TO_DELETE=$(tail -n $DELETE_COUNT folders.txt)
-            
-            # Отладочный вывод для проверки папок на удаление
-            echo "Папки для удаления:"
-            echo "$FOLDERS_TO_DELETE"
-
-            # Удаляем старые папки
-            for FOLDER in $FOLDERS_TO_DELETE; do
-              echo "Удаление папки: $FOLDER"
-              aws s3 rm s3://${{ env.AWS_BUCKET_NAME }}/$FOLDER --recursive
-            done
-          else
-            echo "Нет папок для удаления."
-          fi
+          aws s3 cp ${{ env.BUILD_REPO_NAME }}.zip s3://${{ env.AWS_BUCKET_NAME }}/${{ env.BUILD_REPO_NAME }}.zip --region ${{ env.AWS_REGION }}
         
       - name: Cleaning up
         run: |
