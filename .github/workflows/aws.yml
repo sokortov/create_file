@@ -61,11 +61,11 @@ jobs:
       - name: Clean old builds from S3
         if: success()
         run: |
-          folders=$(aws s3api list-objects-v2 --bucket ${{ env.AWS_BUCKET_NAME }} --prefix ${{ env.PROJECT_NAME }}/ --delimiter '/' --query "CommonPrefixes[*].Prefix" --output text | sort -r)
+          folders=$(aws s3api list-objects-v2 --bucket ${{ env.AWS_BUCKET_NAME }} --prefix ${{ env.PROJECT_NAME }}/ --query "Contents[].[Key, LastModified]" --output text | grep '/$' | sort -k2,2 | awk '{print $1}')
           counter=0
           for folder in $folders; do
             if [ $counter -ge 2 ]; then
-              aws s3 rm s3://${{ env.AWS_BUCKET_NAME }}/${folder} --recursive
+              aws s3 rm s3://${{ env.AWS_BUCKET_NAME }}/$folder --recursive
             fi
             counter=$((counter + 1))
-          done 
+          done
