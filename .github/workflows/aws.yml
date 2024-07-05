@@ -54,7 +54,7 @@ jobs:
 
       - name: List and delete old folders in S3 bucket
         run: |
-          # Получаем список всех объектов в бакете
+          # Получаем  список всех объектов в бакете
           echo "Получаем список всех объектов в бакете:"
           aws s3 ls s3://${{ env.AWS_BUCKET_NAME }}/ --recursive
           
