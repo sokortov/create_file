@@ -62,24 +62,19 @@ jobs:
         if: success()
         run: |
           echo "Listing all folders in s3://${{ env.AWS_BUCKET_NAME }}/${{ env.PROJECT_NAME }}/"
-          folder_list=$(aws s3api list-objects-v2 --bucket ${{ env.AWS_BUCKET_NAME }} --prefix ${{ env.PROJECT_NAME }}/ --delimiter '/' --query 'CommonPrefixes[*].Prefix' --output text)
+          folder_list=$(aws s3api list-objects-v2 --bucket ${{ env.AWS_BUCKET_NAME }} --prefix ${{ env.PROJECT_NAME }}/ --query 'reverse(sort_by(Contents, &LastModified))' --output json | jq -r '.[].Key')
           echo "Folder list:"
           echo "$folder_list"
-          
-          # Получаем и сортируем список папок по дате
-          sorted_folders=$(echo "$folder_list" | sort -r)
-          echo "All folders sorted by date:"
-          echo "$sorted_folders"
-          
+
           # Оставляем только две последние папки
-          folders_to_keep=$(echo "$sorted_folders" | head -n 2)
+          folders_to_keep=($(echo "$folder_list" | head -n 2))
           echo "Folders to keep:"
-          echo "$folders_to_keep"
-          
+          echo "${folders_to_keep[@]}"
+
           # Удаляем остальные папки
-          while read -r folder; do
-            if [[ -n "$folder" ]]; then
+          for folder in $folder_list; do
+            if [[ ! " ${folders_to_keep[@]} " =~ " $folder " ]]; then
               echo "Deleting folder: $folder"
               aws s3 rm "s3://${{ env.AWS_BUCKET_NAME }}/$folder" --recursive
             fi
-          done <<< "$folder_list"
+          done
