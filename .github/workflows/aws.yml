@@ -41,7 +41,7 @@ jobs:
       - name: Build ${{ env.PROJECT_NAME }} ${{ env.MODE }}
         run: |
           python build.py ${{ env.BUILD_REPO_NAME }} ${{ env.MODE }}
-      
+          
       - name: Upload to S3
         if: success()
         run: |
