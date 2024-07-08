@@ -45,7 +45,9 @@ jobs:
       - name: Upload to S3
         if: success()
         run: |
-          zip -r -j ${{ env.BUILD_REPO_NAME }}.zip ${{ env.BUILD_REPO_NAME }}/*
+          zip -r ${{ env.BUILD_REPO_NAME }}.zip ${{ env.BUILD_REPO_NAME }}/*
+№          cd ${{ env.BUILD_REPO_NAME }}
+          
           aws s3 cp ${{ env.BUILD_REPO_NAME }}.zip s3://${{ env.AWS_BUCKET_NAME }}/${{ env.UPLOAD_REPO_NAME }}.zip --region ${{ env.AWS_REGION }}
           
       - name: Cleaning up
