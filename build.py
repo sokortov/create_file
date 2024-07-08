@@ -51,5 +51,5 @@ if __name__ == "__main__":
     # Выполнение команды sudo apt update перед созданием файла
     test_sudo()
     
-    # Создание текстового файла
+    # Создание текстового файла 
     create_text_file(args.directory, args.mode)
