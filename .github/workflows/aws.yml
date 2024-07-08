@@ -51,7 +51,7 @@ jobs:
 
         if: success()
         run: |
-          aws s3 cp ${{ env.BUILD_REPO_NAME }} s3://${{ env.AWS_BUCKET_NAME }}/${{ env.UPLOAD_REPO_NAME }} --region ${{ env.AWS_REGION }}
+          aws s3 cp ${{ env.BUILD_REPO_NAME }} s3://${{ env.AWS_BUCKET_NAME }}/${{ env.UPLOAD_REPO_NAME }} --recursive --region ${{ env.AWS_REGION }}
         
       - name: Cleaning up
         run: |
