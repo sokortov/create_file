@@ -16,7 +16,8 @@ jobs:
       PYTHON_VERSION: '3.12'
       PROJECT_NAME: ${{ github.event.repository.name }}
       MODE: ${{ matrix.mode }}
-      BUILD_REPO_NAME: ${{ github.event.repository.name }}/${{ github.sha }}/${{ matrix.mode }}
+      UPLOAD_REPO_NAME: ${{ github.event.repository.name }}/${{ github.event.run_number }}/${{ matrix.mode }}
+      BUILD_REPO_NAME: ${{ matrix.mode }}
       AWS_BUCKET_NAME: ${{ secrets.AWS_BUCKET_NAME }}
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -40,15 +41,8 @@ jobs:
       - name: Build ${{ env.PROJECT_NAME }} ${{ env.MODE }}
         run: |
           python build.py ${{ env.BUILD_REPO_NAME }} ${{ env.MODE }}
-          
-      - name: Get commit message
-        id: get_commit
-        run: echo "COMMIT_MESSAGE=$(git log -1 --pretty=%B)" >> $GITHUB_ENV
       
       - name: Upload to S3
-        env:
-          UPLOAD_REPO_NAME: ${{ github.event.repository.name }}/${{ env.COMMIT_MESSAGE }}/${{ matrix.mode }}
-
         if: success()
         run: |
           zip -r ${{ env.BUILD_REPO_NAME }}.zip ${{ env.BUILD_REPO_NAME }} -x "${{ env.BUILD_REPO_NAME }}"
