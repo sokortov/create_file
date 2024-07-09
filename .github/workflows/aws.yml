@@ -17,11 +17,11 @@ jobs:
       PROJECT_NAME: ${{ github.event.repository.name }}
       MODE: ${{ matrix.mode }}
       BUILD_REPO: ${{ matrix.mode }}
-      UPLOAD_REPO: ${{ github.event.repository.name }}/${{ github.run_number }}/${{ matrix.mode }}
       AWS_BUCKET_NAME: ${{ secrets.AWS_BUCKET_NAME }}
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_REGION: ${{ secrets.AWS_REGION }}
+      UPLOAD_REPO: ${{ github.event.repository.name }}/${{ github.run_number }}/${{ matrix.mode }}
       OLD_BUILDS_TO_KEEP: 2
       
     steps:
@@ -63,5 +63,8 @@ jobs:
           folders_to_delete=("${folder_array[@]:0:${#folder_array[@]}-${{ env.OLD_BUILDS_TO_KEEP }}}")
           
           for folder in "${folders_to_delete[@]}"; do
-            aws s3 rm "s3://${{ env.AWS_BUCKET_NAME }}/$folder" --recursive
-          done 
+            # Проверяем, что папка не является tagged
+            if [[ "$folder" != *"tagged/"* ]]; then
+              aws s3 rm "s3://${{ env.AWS_BUCKET_NAME }}/$folder" --recursive
+            fi
+          done
