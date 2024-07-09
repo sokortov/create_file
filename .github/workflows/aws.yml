@@ -57,7 +57,6 @@ jobs:
       - name: Clean old builds from S3
         if: success()
         run: |
-        
           # Retrieve a list of folders in the specified bucket and project prefix.
           folder_list=$(aws s3api list-objects-v2 \
                           --bucket ${{ env.AWS_BUCKET_NAME }} \
