@@ -1,6 +1,22 @@
 name: Build and upload to S3
 
 on: push
+
+matrix:
+  mode: [DEBUG, RELEASE]
+  
+env:
+  PYTHON_VERSION: '3.12'
+  PROJECT_NAME: ${{ github.event.repository.name }}
+  MODE: ${{ matrix.mode }}
+  BUILD_REPO: ${{ matrix.mode }}
+  AWS_BUCKET_NAME: ${{ secrets.AWS_BUCKET_NAME }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  UPLOAD_REPO: ${{ github.event.repository.name }}/${{ github.run_number }}/${{ matrix.mode }}
+  S3_FOLDER_TO_KEEP : 'tagged'
+  S3_BUILDS_COUNT_TO_KEEP: 2
       
 jobs:
   run-and-upload:
@@ -10,21 +26,8 @@ jobs:
 
     strategy:
       matrix:
-        mode: [DEBUG, RELEASE]
+        mode: ${{ matrix.mode }}
         
-    env:
-      PYTHON_VERSION: '3.12'
-      PROJECT_NAME: ${{ github.event.repository.name }}
-      MODE: ${{ matrix.mode }}
-      BUILD_REPO: ${{ matrix.mode }}
-      AWS_BUCKET_NAME: ${{ secrets.AWS_BUCKET_NAME }}
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_REGION: ${{ secrets.AWS_REGION }}
-      UPLOAD_REPO: ${{ github.event.repository.name }}/${{ github.run_number }}/${{ matrix.mode }}
-      S3_FOLDER_TO_KEEP : 'tagged'
-      S3_BUILDS_COUNT_TO_KEEP: 2
-      
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -48,11 +51,6 @@ jobs:
         run: |
           (cd ${{ env.BUILD_REPO }} && zip -r "$OLDPWD/${{ env.BUILD_REPO }}.zip" .)
           aws s3 cp ${{ env.BUILD_REPO }}.zip s3://${{ env.AWS_BUCKET_NAME }}/${{ env.UPLOAD_REPO }}.zip --region ${{ env.AWS_REGION }}
-          
-      - name: Clean up working folder
-        run: |
-          rm -r -f ${{ env.BUILD_REPO }}
-          rm -f ${{ env.BUILD_REPO }}.zip
 
       - name: Clean old builds from S3
         if: success()
@@ -81,3 +79,8 @@ jobs:
           for folder in "${folders_to_delete[@]}"; do
             aws s3 rm "s3://${{ env.AWS_BUCKET_NAME }}/$folder" --recursive
           done
+          
+      - name: Clean up working folder
+        run: |
+          rm -r -f ${{ env.BUILD_REPO }}
+          rm -f ${{ env.BUILD_REPO }}.zip
