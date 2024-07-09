@@ -57,8 +57,8 @@ jobs:
       - name: Clean old builds from S3
         if: success()
         run: |
-          
-          # Get a list of folders except the reserved one
+        
+          # Retrieve a list of folders in the specified bucket and project prefix.
           folder_list=$(aws s3api list-objects-v2 \
                           --bucket ${{ env.AWS_BUCKET_NAME }} \
                           --prefix ${{ env.PROJECT_NAME }}/ \
@@ -66,15 +66,19 @@ jobs:
                           --query "CommonPrefixes[?Prefix != \`${{ env.PROJECT_NAME }}/${{ env.S3_FOLDER_TO_KEEP }}/\`].Prefix" \
                           --output text)
          
-         # Get the latest date and time of each folder contents and sort folders
+          # Iterate through each folder to find the latest date and time of its contents.
           folders_with_dates=$(for folder in $folder_list; do
                                 echo "$(aws s3 ls s3://${{ env.AWS_BUCKET_NAME }}/$folder --recursive | sort | tail -n 1) $folder"
                               done)
+          
+          # Sort folders based on the latest date and time.
           sorted_folders=$(echo "$folders_with_dates" | sort | awk '{print $NF}')
           folder_array=($sorted_folders)
           
-          #Delete all old folders except last ones
+          # Determine the number of folders to delete based on the configured count to keep.
           folders_to_delete=("${folder_array[@]:0:${#folder_array[@]}-${{ env.S3_BUILDS_COUNT_TO_KEEP }}}")
+          
+          # Delete the identified folders and their contents from the S3 bucket.
           for folder in "${folders_to_delete[@]}"; do
             aws s3 rm "s3://${{ env.AWS_BUCKET_NAME }}/$folder" --recursive
           done
