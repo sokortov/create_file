@@ -50,8 +50,8 @@ jobs:
           
       - name: Cleaning up
         run: |
-          rm -r -f ${{ env.BUILD_REPO_NAME }}
-          rm -f ${{ env.BUILD_REPO_NAME }}.zip
+          # rm -r -f ${{ env.BUILD_REPO_NAME }}
+          # rm -f ${{ env.BUILD_REPO_NAME }}.zip
 
       - name: Clean old builds from S3
         if: success()
