@@ -58,16 +58,11 @@ jobs:
         run: |
           folder_list=$(aws s3api list-objects-v2 --bucket ${{ env.AWS_BUCKET_NAME }} --prefix ${{ env.PROJECT_NAME }}/ --delimiter '/' --query 'CommonPrefixes[*].Prefix' --output text)
           
-          # Проверка успешного выполнения предыдущей команды
-          if [ $? -ne 0 ]; then
-              echo "Error retrieving folder list from S3"
-              exit 1
-          fi
+          # Исключаем папку tagged
+          folder_list=$(echo "$folder_list" | grep -v '/taged/')
 
-          # Исключение папки "tagged"
-          folder_list=$(echo "$folder_list" | grep -v "${{ env.PROJECT_NAME }}/tagged/" || true)
-
-          echo "Filtered folder list:"
+          # Выводим список папок для отладки
+          echo "Folders list:"
           echo "$folder_list"
           
           folders_with_dates=$(for folder in $folder_list; do echo "$(aws s3 ls s3://${{ env.AWS_BUCKET_NAME }}/$folder --recursive | sort | tail -n 1) $folder"; done)
