@@ -71,8 +71,8 @@ jobs:
           )
           folders_with_dates=$(for folder in $folder_list; do echo "$(aws s3 ls s3://${{ env.AWS_BUCKET_NAME }}/$folder --recursive | sort | tail -n 1) $folder"; done)
           sorted_folders=$(echo "$folders_with_dates" | sort | awk '{print $NF}')
-          #folder_array=($sorted_folders)
-          folders_to_delete=("${sorted_folders[@]:0:${#sorted_folders[@]}-${{ env.OLD_BUILDS_TO_KEEP }}}")
+          folder_array=($sorted_folders)
+          folders_to_delete=("${folder_array[@]:0:${#folder_array[@]}-${{ env.OLD_BUILDS_TO_KEEP }}}")
           for folder in "${folders_to_delete[@]}"; do
             aws s3 rm "s3://${{ env.AWS_BUCKET_NAME }}/$folder" --recursive
           done
