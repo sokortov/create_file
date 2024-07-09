@@ -63,7 +63,7 @@ jobs:
           folder_list=$(aws s3api list-objects-v2 --bucket ${{ env.AWS_BUCKET_NAME }} --prefix ${{ env.PROJECT_NAME }}/ --delimiter '/' --query 'CommonPrefixes[*].Prefix' --output text)
 
           # Удаляем строку, содержащую "taged" с помощью grep
-          folder_list=$(echo "$folder_list" | grep -v '/tagged/' || true)  # Используем "|| true", чтобы скрипт не падал из-за ошибки grep
+          folder_list=$(echo "$folder_list" | grep -v '/create_file\/tagged\//')
 
           echo "$folder_list"  # Выводим результат для отладки
           
