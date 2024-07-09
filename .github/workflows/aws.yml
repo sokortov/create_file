@@ -45,13 +45,13 @@ jobs:
       - name: Upload to S3
         if: success()
         run: |
-          (cd ${{ env.BUILD_REPO_NAME }} && zip -r "$OLDPWD/${{ env.MODE }}.zip" .)
+          (cd ${{ env.BUILD_REPO_NAME }} && zip -r "$OLDPWD/${{ env.BUILD_REPO_NAME }}.zip" .)
           aws s3 cp ${{ env.BUILD_REPO_NAME }}.zip s3://${{ env.AWS_BUCKET_NAME }}/${{ env.UPLOAD_REPO_NAME }}.zip --region ${{ env.AWS_REGION }}
           
       - name: Cleaning up
         run: |
           rm -r -f ${{ env.BUILD_REPO_NAME }}
-          rm -f ${{ env.MODE }}.zip
+          rm -f ${{ env.BUILD_REPO_NAME }}.zip
 
       - name: Clean old builds from S3
         if: success()
