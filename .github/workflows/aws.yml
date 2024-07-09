@@ -59,7 +59,7 @@ jobs:
           folder_list=$(aws s3api list-objects-v2 --bucket ${{ env.AWS_BUCKET_NAME }} --prefix ${{ env.PROJECT_NAME }}/ --delimiter '/' --query 'CommonPrefixes[*].Prefix' --output text)
           
           # Исключаем папку tagged
-          folder_list=$(echo "$folder_list" | grep -v `${{ env.PROJECT_NAME }}/tagged/`)
+          folder_list=$(echo "$folder_list" | grep -v "${{ env.PROJECT_NAME }}/tagged/")
 
           # Выводим список папок для отладки
           echo "Folders list:"
