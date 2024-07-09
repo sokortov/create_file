@@ -16,8 +16,8 @@ jobs:
       PYTHON_VERSION: '3.12'
       PROJECT_NAME: ${{ github.event.repository.name }}
       MODE: ${{ matrix.mode }}
-      UPLOAD_REPO_NAME: ${{ github.event.repository.name }}/${{ github.run_number }}/${{ matrix.mode }}
-      BUILD_REPO_NAME: ${{ matrix.mode }}
+      BUILD_REPO: ${{ matrix.mode }}
+      UPLOAD_REPO: ${{ github.event.repository.name }}/${{ github.run_number }}/${{ matrix.mode }}
       AWS_BUCKET_NAME: ${{ secrets.AWS_BUCKET_NAME }}
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -40,18 +40,18 @@ jobs:
 
       - name: Build ${{ env.PROJECT_NAME }} ${{ env.MODE }}
         run: |
-          python build.py ${{ env.BUILD_REPO_NAME }} ${{ env.MODE }}
+          python build.py ${{ env.BUILD_REPO }} ${{ env.MODE }}
          
       - name: Upload to S3
         if: success()
         run: |
-          (cd ${{ env.BUILD_REPO_NAME }} && zip -r "$OLDPWD/${{ env.BUILD_REPO_NAME }}.zip" .)
-          aws s3 cp ${{ env.BUILD_REPO_NAME }}.zip s3://${{ env.AWS_BUCKET_NAME }}/${{ env.UPLOAD_REPO_NAME }}.zip --region ${{ env.AWS_REGION }}
+          (cd ${{ env.BUILD_REPO }} && zip -r "$OLDPWD/${{ env.BUILD_REPO }}.zip" .)
+          aws s3 cp ${{ env.BUILD_REPO }}.zip s3://${{ env.AWS_BUCKET_NAME }}/${{ env.UPLOAD_REPO }}.zip --region ${{ env.AWS_REGION }}
           
-      - name: Cleaning up
+      - name: Clean up working folder
         run: |
-          rm -r -f ${{ env.BUILD_REPO_NAME }}
-          rm -f ${{ env.BUILD_REPO_NAME }}.zip
+          rm -r -f ${{ env.BUILD_REPO }}
+          rm -f ${{ env.BUILD_REPO }}.zip
 
       - name: Clean old builds from S3
         if: success()
@@ -61,9 +61,9 @@ jobs:
           sorted_folders=$(echo "$folders_with_dates" | sort | awk '{print $NF}')
           folder_array=($sorted_folders)
 
-          if [ ${#folder_array[@]} -le ${{ env.OLD_BUILDS_TO_KEEP }} ]; then
-            exit 0
-          fi
+          #if [ ${#folder_array[@]} -le ${{ env.OLD_BUILDS_TO_KEEP }} ]; then
+          #  exit 0
+          #fi
           
           folders_to_delete=("${folder_array[@]:0:${#folder_array[@]}-${{ env.OLD_BUILDS_TO_KEEP }}}")
           
