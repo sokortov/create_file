@@ -26,7 +26,7 @@ jobs:
       MODE: ${{ matrix.mode }}
       BUILD_REPO: ${{ matrix.mode }}
       UPLOAD_REPO: ${{ github.event.repository.name }}/${{ github.run_number }}/${{ matrix.mode }}
-      UPLOAD_REPO_1: ${{ env.S3_FOLDER_TO_KEEP }}
+      UPLOAD_REPO_1: $S3_FOLDER_TO_KEEP
         
     steps:
       - name: Checkout repository
