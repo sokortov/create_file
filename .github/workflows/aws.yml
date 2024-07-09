@@ -22,7 +22,7 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_REGION: ${{ secrets.AWS_REGION }}
-      PREFIX: ''
+      OLD_BUILDS_TO_KEEP: 2
       
     steps:
       - name: Checkout repository
@@ -61,11 +61,11 @@ jobs:
           sorted_folders=$(echo "$folders_with_dates" | sort | awk '{print $NF}')
           folder_array=($sorted_folders)
 
-          if [ ${#folder_array[@]} -le 2 ]; then
+          if [ ${#folder_array[@]} -le ${{ env.OLD_BUILDS_TO_KEEP }} ]; then
             exit 0
           fi
           
-          folders_to_delete=("${folder_array[@]:0:${#folder_array[@]}-2}")
+          folders_to_delete=("${folder_array[@]:0:${#folder_array[@]}-${{ env.OLD_BUILDS_TO_KEEP }}}")
           
           for folder in "${folders_to_delete[@]}"; do
             aws s3 rm "s3://${{ env.AWS_BUCKET_NAME }}/$folder" --recursive
