@@ -1,9 +1,6 @@
 name: Build and upload to S3
 
 on: push
-
-matrix:
-  mode: [DEBUG, RELEASE]
   
 env:
   PYTHON_VERSION: '3.12'
@@ -26,7 +23,7 @@ jobs:
 
     strategy:
       matrix:
-        mode: ${{ matrix.mode }}
+        mode: [DEBUG, RELEASE]
         
     steps:
       - name: Checkout repository
