@@ -1,16 +1,6 @@
 name: Build and upload to S3
 
 on: push
-  
-env:
-  PYTHON_VERSION: '3.12'
-  PROJECT_NAME: ${{ github.event.repository.name }}
-  AWS_BUCKET_NAME: ${{ secrets.AWS_BUCKET_NAME }}
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  AWS_REGION: ${{ secrets.AWS_REGION }}
-  S3_FOLDER_TO_KEEP : 'tagged'
-  S3_BUILDS_COUNT_TO_KEEP: 2
       
 jobs:
   run-and-upload:
@@ -23,10 +13,17 @@ jobs:
         mode: [DEBUG, RELEASE]
         
     env:
+      PYTHON_VERSION: '3.12'
+      PROJECT_NAME: ${{ github.event.repository.name }}
       MODE: ${{ matrix.mode }}
       BUILD_REPO: ${{ matrix.mode }}
+      AWS_BUCKET_NAME: ${{ secrets.AWS_BUCKET_NAME }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      S3_FOLDER_TO_KEEP : 'tagged'
+      S3_BUILDS_COUNT_TO_KEEP: 2
       UPLOAD_REPO: ${{ github.event.repository.name }}/${{ github.run_number }}/${{ matrix.mode }}
-      UPLOAD_REPO_1: $S3_FOLDER_TO_KEEP
         
     steps:
       - name: Checkout repository
