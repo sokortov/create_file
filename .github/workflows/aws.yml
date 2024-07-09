@@ -67,4 +67,4 @@ jobs:
             if [[ "$folder" != *"tagged/"* ]]; then
               aws s3 rm "s3://${{ env.AWS_BUCKET_NAME }}/$folder" --recursive
             fi
-          done 
+          done
