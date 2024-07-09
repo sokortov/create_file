@@ -58,8 +58,23 @@ jobs:
         run: |
           folder_list=$(aws s3api list-objects-v2 --bucket ${{ env.AWS_BUCKET_NAME }} --prefix ${{ env.PROJECT_NAME }}/ --delimiter '/' --query 'CommonPrefixes[*].Prefix' --output text)
           
-          # Исключаем папку tagged
+          # Проверка успешного выполнения предыдущей команды
+          if [ $? -ne 0 ]; then
+              echo "Error retrieving folder list from S3"
+              exit 1
+          fi
+
+          # Исключение папки "tagged"
           folder_list=$(echo "$folder_list" | grep -v "${{ env.PROJECT_NAME }}/tagged/")
+
+          # Проверка успешного выполнения команды grep
+          if [ $? -ne 0 ]; then
+              echo "Error processing folder list"
+              exit 1
+          fi
+
+          echo "Filtered folder list:"
+          echo "$folder_list"
 
           # Выводим список папок для отладки
           echo "Folders list:"
