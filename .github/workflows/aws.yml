@@ -42,16 +42,19 @@ jobs:
         run: |
           python build.py ${{ env.BUILD_REPO }} ${{ env.MODE }}
           
-      - name: Upload to S3
+      - name: Set upload repo
         if: success()
         run: |
           #Set upload repo
-          if [ "${{ github.event.release.tag_name }}" != "null" ]; then
+          if [ -n "${{ github.event.release.tag_name }}" ]; then
             echo "UPLOAD_REPO=${{ github.event.repository.name }}/${{ env.S3_FOLDER_TO_KEEP }}/${{ github.event.release.tag_name }}${{ github.run_number }}/${{ matrix.mode }}" >> $GITHUB_ENV
           else
             echo "UPLOAD_REPO=${{ github.event.repository.name }}/${{ github.run_number }}/${{ matrix.mode }}" >> $GITHUB_ENV
           fi
           
+      - name: Upload to S3
+        if: success()
+        run: |
           #Archiving files
           (cd ${{ env.BUILD_REPO }} && zip -r "$OLDPWD/${{ env.BUILD_REPO }}.zip" .)
           
