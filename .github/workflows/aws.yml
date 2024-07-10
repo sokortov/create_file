@@ -41,20 +41,21 @@ jobs:
       - name: Build ${{ env.PROJECT_NAME }} ${{ env.MODE }}
         run: |
           python build.py ${{ env.BUILD_REPO }} ${{ env.MODE }}
-         
-      - name: Set UPLOAD_REPO
+          
+      - name: Upload to S3
         if: success()
         run: |
+          #Set upload repo
           if [ "${{ github.event.release.tag_name }}" != "null" ]; then
             echo "UPLOAD_REPO=${{ github.event.repository.name }}/${{ env.S3_FOLDER_TO_KEEP }}/${{ github.event.release.tag_name }}${{ github.run_number }}/${{ matrix.mode }}" >> $GITHUB_ENV
           else
             echo "UPLOAD_REPO=${{ github.event.repository.name }}/${{ env.S3_FOLDER_TO_KEEP }}/${{ github.run_number }}/${{ matrix.mode }}" >> $GITHUB_ENV
           fi
           
-      - name: Upload to S3
-        if: success()
-        run: |
+          #Archiving files
           (cd ${{ env.BUILD_REPO }} && zip -r "$OLDPWD/${{ env.BUILD_REPO }}.zip" .)
+          
+          #Upload to S3
           aws s3 cp ${{ env.BUILD_REPO }}.zip s3://${{ env.AWS_BUCKET_NAME }}/${{ env.UPLOAD_REPO }}.zip --region ${{ env.AWS_REGION }}
 
       - name: Clean old builds from S3
