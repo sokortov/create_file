@@ -26,12 +26,11 @@ jobs:
         
     steps:
       - name: Set UPLOAD_REPO
-        id: set_upload_repo
         run: |
           if [ -n "${{ github.event.release.tag_name }}" ]; then
-            echo "UPLOAD_REPO=${{ github.event.repository.name }}/${{ env.S3_FOLDER_TO_KEEP }}/${{ github.event.release.tag_name }}${{ github.run_number }}/${{ matrix.mode }}" >> $GITHUB_ENV
+            echo "UPLOAD_REPO=${{ github.event.repository.name }}/${{ env.S3_FOLDER_TO_KEEP }}/${{ github.event.release.tag_name }}${{ github.run_number }}" >> $GITHUB_ENV
           else
-            echo "UPLOAD_REPO=${{ github.event.repository.name }}/${{ env.S3_FOLDER_TO_KEEP }}/${{ github.run_number }}/${{ matrix.mode }}" >> $GITHUB_ENV
+            echo "UPLOAD_REPO=${{ github.event.repository.name }}/${{ env.S3_FOLDER_TO_KEEP }}/${{ github.run_number }}" >> $GITHUB_ENV
           fi
           
       - name: Checkout repository
@@ -55,7 +54,7 @@ jobs:
         if: success()
         run: |
           (cd ${{ env.BUILD_REPO }} && zip -r "$OLDPWD/${{ env.BUILD_REPO }}.zip" .)
-          aws s3 cp ${{ env.BUILD_REPO }}.zip s3://${{ env.AWS_BUCKET_NAME }}/${{ env.UPLOAD_REPO }}.zip --region ${{ env.AWS_REGION }}
+          aws s3 cp ${{ env.BUILD_REPO }}.zip s3://${{ env.AWS_BUCKET_NAME }}/${{ env.UPLOAD_REPO }} --region ${{ env.AWS_REGION }}
 
       - name: Clean old builds from S3
         if: success()
