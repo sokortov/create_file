@@ -25,9 +25,9 @@ jobs:
       S3_BUILDS_COUNT_TO_KEEP: 2
       GITHUB_ENV: |
         if [ -n "${{ github.event.release.tag_name }}" ]; then
-          echo "UPLOAD_REPO=${{ github.event.repository.name }}/${{ env.S3_FOLDER_TO_KEEP }}/${{ github.event.release.tag_name }}${{ github.run_number }}/${{ matrix.mode }}"
+          echo "UPLOAD_REPO=${{ github.event.repository.name }}/$S3_FOLDER_TO_KEEP/${{ github.event.release.tag_name }}${{ github.run_number }}/${{ matrix.mode }}"
         else
-          echo "UPLOAD_REPO=${{ github.event.repository.name }}/${{ env.S3_FOLDER_TO_KEEP }}/${{ github.run_number }}/${{ matrix.mode }}"
+          echo "UPLOAD_REPO=${{ github.event.repository.name }}/$S3_FOLDER_TO_KEEP/${{ github.run_number }}/${{ matrix.mode }}"
         fi >> $GITHUB_ENV
         
     steps:
