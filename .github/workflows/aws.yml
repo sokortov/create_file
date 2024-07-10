@@ -49,7 +49,7 @@ jobs:
           if [ "${{ github.event.release.tag_name }}" != "null" ]; then
             echo "UPLOAD_REPO=${{ github.event.repository.name }}/${{ env.S3_FOLDER_TO_KEEP }}/${{ github.event.release.tag_name }}${{ github.run_number }}/${{ matrix.mode }}" >> $GITHUB_ENV
           else
-            echo "UPLOAD_REPO=${{ github.event.repository.name }}/${{ env.S3_FOLDER_TO_KEEP }}/${{ github.run_number }}/${{ matrix.mode }}" >> $GITHUB_ENV
+            echo "UPLOAD_REPO=${{ github.event.repository.name }}/${{ github.run_number }}/${{ matrix.mode }}" >> $GITHUB_ENV
           fi
           
           #Archiving files
