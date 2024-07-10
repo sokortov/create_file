@@ -42,7 +42,7 @@ jobs:
         run: |
           python build.py ${{ env.BUILD_REPO }} ${{ env.MODE }}
           
-      - name: Upload to S3
+      - name: Set upload repo
         if: success()
         run: |
           #Set upload repo
@@ -51,8 +51,10 @@ jobs:
           else
             echo "UPLOAD_REPO=${{ github.event.repository.name }}/${{ github.run_number }}/${{ matrix.mode }}" >> $GITHUB_ENV
           fi
-          echo "UPLOAD_REPO=$UPLOAD_REPO" >> $GITHUB_ENV
-
+          
+      - name: Upload to S3
+        if: success()
+        run: |
           #Archiving files
           (cd ${{ env.BUILD_REPO }} && zip -r "$OLDPWD/${{ env.BUILD_REPO }}.zip" .)
           
