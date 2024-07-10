@@ -23,7 +23,7 @@ jobs:
       AWS_REGION: ${{ secrets.AWS_REGION }}
       S3_FOLDER_TO_KEEP : 'tagged'
       S3_BUILDS_COUNT_TO_KEEP: 2
-      UPLOAD_REPO: ${{ github.event.repository.name }}${{ github.event.release.tag_name && '/'${{ env.S3_FOLDER_TO_KEEP }}'/'github.event.release.tag_name || '' }}${{ github.run_number }}/${{ matrix.mode }}
+      UPLOAD_REPO: ${{ github.event.repository.name }}${{ github.event.release.tag_name &&/${{ env.S3_FOLDER_TO_KEEP }}/github.event.release.tag_name || '' }}${{ github.run_number }}/${{ matrix.mode }}
 
     steps:
       - name: Checkout repository
