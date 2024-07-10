@@ -53,8 +53,8 @@ jobs:
       - name: Upload to S3
         if: success()
         run: |
-          #(cd ${{ env.BUILD_REPO }} && zip -r "$OLDPWD/${{ env.BUILD_REPO }}.zip" .)
-          aws s3 cp ${{ env.BUILD_REPO }} s3://${{ env.AWS_BUCKET_NAME }}/${{ env.UPLOAD_REPO }}.zip --recursive --region ${{ env.AWS_REGION }}
+          (cd ${{ env.BUILD_REPO }} && zip -r "$OLDPWD/${{ env.BUILD_REPO }}.zip" .)
+          aws s3 cp ${{ env.BUILD_REPO }}.zip s3://${{ env.AWS_BUCKET_NAME }}/${{ env.UPLOAD_REPO }}.zip --region ${{ env.AWS_REGION }}
 
       - name: Clean old builds from S3
         if: success()
