@@ -52,7 +52,7 @@ jobs:
           fi
           
       - name: Upload to S3
-        if: success() && contains('refs/heads/main', github.ref)
+        if: success() && startsWith(github.ref, 'refs/tags/') || contains('refs/heads/main', github.ref)
         run: |
           #Archiving files
           (cd ${{ env.BUILD_REPO }} && zip -r "$OLDPWD/${{ env.BUILD_REPO }}.zip" .)
