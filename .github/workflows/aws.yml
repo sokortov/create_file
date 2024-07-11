@@ -42,20 +42,17 @@ jobs:
         run: |
           python build.py ${{ env.BUILD_REPO }} ${{ env.MODE }}
           
-      - name: Set upload repo 
+      - name: Set upload repo
         if: success()
         run: |
-          #Set upload repo
-          if [ -n "${{ github.event.release.tag_name }}" ]; then
-            echo "UPLOAD_REPO=${{ github.event.repository.name }}/${{ env.S3_FOLDER_TO_KEEP }}/${{ github.event.release.tag_name }}${{ github.run_number }}/${{ matrix.mode }}" >> $GITHUB_ENV
+          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            echo "UPLOAD_REPO=${{ env.PROJECT_NAME }}/${{ env.S3_FOLDER_TO_KEEP }}/${{ github.ref_name }}-${{ github.run_number }}/$${{ env.MODE }}" >> $GITHUB_ENV
           else
-            echo "UPLOAD_REPO=${{ github.event.repository.name }}/${{ github.run_number }}/${{ matrix.mode }}" >> $GITHUB_ENV
+            echo "UPLOAD_REPO=${{ env.PROJECT_NAME }}/${{ github.run_number }}/$${{ env.MODE }}" >> $GITHUB_ENV
           fi
           
       - name: Upload to S3
-        if: success() && contains('
-                                  refs/heads/main
-                                  ', github.ref)
+        if: success() && contains('refs/heads/main', github.ref)
         run: |
           #Archiving files
           (cd ${{ env.BUILD_REPO }} && zip -r "$OLDPWD/${{ env.BUILD_REPO }}.zip" .)
@@ -73,19 +70,19 @@ jobs:
                           --delimiter '/' \
                           --query "CommonPrefixes[?Prefix != \`${{ env.PROJECT_NAME }}/${{ env.S3_FOLDER_TO_KEEP }}/\`].Prefix" \
                           --output text)
-         
+
           # Iterate through each folder to find the latest date and time of its contents.
           folders_with_dates=$(for folder in $folder_list; do
                                 echo "$(aws s3 ls s3://${{ env.AWS_BUCKET_NAME }}/$folder --recursive | sort | tail -n 1) $folder"
                               done)
-          
+
           # Sort folders based on the latest date and time.
           sorted_folders=$(echo "$folders_with_dates" | sort | awk '{print $NF}')
           folder_array=($sorted_folders)
-          
+
           # Determine the number of folders to delete based on the configured count to keep.
           folders_to_delete=("${folder_array[@]:0:${#folder_array[@]}-${{ env.S3_BUILDS_COUNT_TO_KEEP }}}")
-          
+
           # Delete the identified folders and their contents from the S3 bucket.
           for folder in "${folders_to_delete[@]}"; do
             aws s3 rm "s3://${{ env.AWS_BUCKET_NAME }}/$folder" --recursive
