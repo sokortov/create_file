@@ -53,7 +53,7 @@ jobs:
           fi
           
       - name: Upload to S3
-        if: success() && needs.pr-check.outputs.number != 'null'
+        if: success() && needs.pr-check.outputs.number != null
         run: |
           #Archiving files
           (cd ${{ env.BUILD_REPO }} && zip -r "$OLDPWD/${{ env.BUILD_REPO }}.zip" .)
