@@ -44,6 +44,7 @@ jobs:
           
       - name: Set upload repo 
         if: success()
+        if: needs.pr-check.outputs.number != 'null'
         run: |
           #Set upload repo
           if [ -n "${{ github.event.release.tag_name }}" ]; then
@@ -54,6 +55,7 @@ jobs:
           
       - name: Upload to S3
         if: success()
+        if: needs.pr-check.outputs.number != 'null'
         run: |
           #Archiving files
           (cd ${{ env.BUILD_REPO }} && zip -r "$OLDPWD/${{ env.BUILD_REPO }}.zip" .)
