@@ -46,9 +46,9 @@ jobs:
         if: success()
         run: |
           if [[ "${{ github.ref }}" == refs/tags/* ]]; then
-            echo "UPLOAD_REPO=${{ env.PROJECT_NAME }}/${{ env.S3_FOLDER_TO_KEEP }}/${{ github.ref_name }}-${{ github.run_number }}/$${{ env.MODE }}" >> $GITHUB_ENV
+            echo "UPLOAD_REPO=${{ env.PROJECT_NAME }}/${{ env.S3_FOLDER_TO_KEEP }}/${{ github.ref_name }}-${{ github.run_number }}/${{ env.MODE }}" >> $GITHUB_ENV
           else
-            echo "UPLOAD_REPO=${{ env.PROJECT_NAME }}/${{ github.run_number }}/$${{ env.MODE }}" >> $GITHUB_ENV
+            echo "UPLOAD_REPO=${{ env.PROJECT_NAME }}/${{ github.run_number }}/${{ env.MODE }}" >> $GITHUB_ENV
           fi
           
       - name: Upload to S3
