@@ -23,6 +23,7 @@ jobs:
       AWS_REGION: ${{ secrets.AWS_REGION }}
       S3_FOLDER_TO_KEEP : 'tagged'
       S3_BUILDS_COUNT_TO_KEEP: 2
+      BRANCH: 'refs/heads/main'
         
     steps:
       - name: Checkout repository
@@ -43,7 +44,7 @@ jobs:
           python build.py ${{ env.BUILD_REPO }} ${{ env.MODE }}
           
       - name: Set upload repo
-        # When tag pushed files will be uploaded in the ${{ env.S3_FOLDER_TO_KEEP }} folder
+        # When tag pushed, files will be uploaded in the ${{ env.S3_FOLDER_TO_KEEP }} folder
         if: success()
         run: |
           if [[ "${{ github.ref }}" == refs/tags/* ]]; then
@@ -54,7 +55,7 @@ jobs:
           
       - name: Upload to S3
         #Upload files only if push has tags or the push is made to the main branches
-        if: success() && startsWith(github.ref, 'refs/tags/') || contains('refs/heads/main', github.ref)
+        if: success() && startsWith(github.ref, 'refs/tags/') || contains(${{ env.BRANCH }}, github.ref)
         run: |
           #Archiving files
           (cd ${{ env.BUILD_REPO }} && zip -r "$OLDPWD/${{ env.BUILD_REPO }}.zip" .)
