@@ -93,4 +93,4 @@ jobs:
       - name: Clean up working folder
         run: |
           rm -r -f ${{ env.BUILD_REPO }}
-          rm -f ${{ env.BUILD_REPO }}.zip 
+          rm -f ${{ env.BUILD_REPO }}.zip
