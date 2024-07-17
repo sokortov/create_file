@@ -1,7 +1,17 @@
 name: Build and upload to S3
 
 on: push
-      
+
+env:
+  PYTHON_VERSION: '3.12'
+  PROJECT_NAME: ${{ github.event.repository.name }}
+  AWS_BUCKET_NAME: ${{ secrets.AWS_BUCKET_NAME }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  S3_FOLDER_TO_KEEP : 'tagged'
+  S3_BUILDS_COUNT_TO_KEEP: 2
+  
 jobs:
   run-and-upload:
     name: Build and upload to S3
@@ -13,16 +23,8 @@ jobs:
         mode: [DEBUG, RELEASE]
         
     env:
-      PYTHON_VERSION: '3.12'
-      PROJECT_NAME: ${{ github.event.repository.name }}
       MODE: ${{ matrix.mode }}
       BUILD_REPO: ${{ matrix.mode }}
-      AWS_BUCKET_NAME: ${{ secrets.AWS_BUCKET_NAME }}
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_REGION: ${{ secrets.AWS_REGION }}
-      S3_FOLDER_TO_KEEP : 'tagged'
-      S3_BUILDS_COUNT_TO_KEEP: 2
         
     steps:
       - name: Checkout repository
@@ -61,9 +63,19 @@ jobs:
           
           #Upload to S3
           aws s3 cp ${{ env.BUILD_REPO }}.zip s3://${{ env.AWS_BUCKET_NAME }}/${{ env.UPLOAD_REPO }}.zip --region ${{ env.AWS_REGION }}
-
+          
+      - name: Clean up working folder
+        run: |
+          rm -r -f ${{ env.BUILD_REPO }}
+          rm -f ${{ env.BUILD_REPO }}.zip
+      
+  clean-old-s3-builds:
+    name: Clean old builds from S3
+    
+    runs-on: self-hosted
+    
+    steps:
       - name: Clean old builds from S3
-        if: success()
         run: |
           # Retrieve a list of folders in the specified bucket and project prefix.
           folder_list=$(aws s3api list-objects-v2 \
@@ -89,8 +101,3 @@ jobs:
           for folder in "${folders_to_delete[@]}"; do
             aws s3 rm "s3://${{ env.AWS_BUCKET_NAME }}/$folder" --recursive
           done
-          
-      - name: Clean up working folder
-        run: |
-          rm -r -f ${{ env.BUILD_REPO }}
-          rm -f ${{ env.BUILD_REPO }}.zip
