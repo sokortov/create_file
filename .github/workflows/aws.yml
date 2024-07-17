@@ -71,6 +71,7 @@ jobs:
       
   clean-old-s3-builds:
     name: Clean old builds from S3
+    needs: run-and-upload
     
     runs-on: self-hosted
     
