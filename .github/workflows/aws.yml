@@ -5,7 +5,7 @@ on: push
 env:
   PYTHON_VERSION: '3.12'
   PROJECT_NAME: ${{ github.event.repository.name }}
-  BUILD_PATH: 'build'
+  BUILD_PATH: '~/builds'
   AWS_BUCKET_NAME: ${{ secrets.AWS_BUCKET_NAME }}
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -36,7 +36,7 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Set build repo
-        run: echo "BUILD_REPO=${{ env.BUILD_PATH }}/${{ env.MODE }}" >> $GITHUB_ENV
+        run: echo "BUILD_REPO=${{ env.BUILD_PATH }}/${{ env.PROJECT_NAME }}/${{ env.MODE }}" >> $GITHUB_ENV
 
       - name: Set upload repo
         # When tag pushed, files will be uploaded in the ${{ env.S3_FOLDER_TO_KEEP }} folder
@@ -74,9 +74,9 @@ jobs:
     runs-on: self-hosted
     
     steps:
-      - name: Clean up working folder
-        run: |
-          rm -r -f ${{ env.BUILD_PATH }}
+#      - name: Clean up working folder
+#        run: |
+#          rm -r -f ${{ env.BUILD_PATH }}
           
       - name: Clean old builds from S3
         run: |
