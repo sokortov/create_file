@@ -25,7 +25,7 @@ jobs:
         
     env:
       MODE: ${{ matrix.mode }}
-      BUILD_REPO: ${{ ENV.BUILD_PATH }}/${{ matrix.mode }}
+      BUILD_REPO: ${{ env.BUILD_PATH }}/${{ matrix.mode }}
         
     steps:
       - name: Checkout repository
