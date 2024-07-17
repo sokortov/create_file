@@ -5,7 +5,7 @@ on: push
 env:
   PYTHON_VERSION: '3.12'
   PROJECT_NAME: ${{ github.event.repository.name }}
-  BUILD_PATH: ${{ matrix.mode }}
+  BUILD_PATH: 'build'
   AWS_BUCKET_NAME: ${{ secrets.AWS_BUCKET_NAME }}
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
