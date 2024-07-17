@@ -36,7 +36,7 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Set build repo
-        run: echo "BUILD_REPO=${{ env.BUILD_PATH }}/${{ env.PROJECT_NAME }}/${{ env.MODE }}" >> $GITHUB_ENV
+        run: echo "BUILD_REPO=${{ env.BUILD_PATH }}/${{ env.MODE }}" >> $GITHUB_ENV
 
       - name: Set upload repo
         # When tag pushed, files will be uploaded in the ${{ env.S3_FOLDER_TO_KEEP }} folder
