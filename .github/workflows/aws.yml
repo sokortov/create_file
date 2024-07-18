@@ -100,4 +100,4 @@ jobs:
           # Delete the identified folders and their contents from the S3 bucket.
           for folder in "${folders_to_delete[@]}"; do
             aws s3 rm "s3://${{ env.AWS_BUCKET_NAME }}/$folder" --recursive
-          done 
+          done
