@@ -5,12 +5,11 @@ on: push
 env:
   PYTHON_VERSION: 3.12
   PROJECT_NAME: ${{ github.event.repository.name }}
-  BUILD_PATH: ~/builds/${{ github.event.repository.name }}
   AWS_BUCKET_NAME: ${{ secrets.AWS_BUCKET_NAME }}
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   AWS_REGION: ${{ secrets.AWS_REGION }}
-  S3_FOLDER_TO_KEEP : tagged
+  S3_FOLDER_TO_KEEP: tagged
   S3_BUILDS_COUNT_TO_KEEP: 2
   
 jobs:
@@ -21,10 +20,10 @@ jobs:
 
     strategy:
       matrix:
-        mode: [DEBUG, RELEASE]
-        
-    env:
-      MODE: ${{ matrix.mode }}
+        MODE: [DEBUG, RELEASE]
+      
+      env:
+        BUILD_REPO: build/${{ matrix.MODE }}
         
     steps:
       - name: Checkout repository
@@ -35,16 +34,13 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Set build repo
-        run: echo "BUILD_REPO=${{ env.BUILD_PATH }}/${{ env.MODE }}" >> $GITHUB_ENV
-
       - name: Set upload repo
         # When tag pushed, files will be uploaded in the ${{ env.S3_FOLDER_TO_KEEP }} folder
         run: |
           if [[ "${{ github.ref }}" == refs/tags/* ]]; then
-            echo "UPLOAD_REPO=${{ env.PROJECT_NAME }}/${{ env.S3_FOLDER_TO_KEEP }}/${{ github.ref_name }}-${{ github.run_number }}/${{ env.MODE }}" >> $GITHUB_ENV
+            echo "UPLOAD_REPO=${{ env.PROJECT_NAME }}/${{ env.S3_FOLDER_TO_KEEP }}/${{ github.ref_name }}-${{ github.run_number }}/${{ matrix.MODE }}" >> $GITHUB_ENV
           else
-            echo "UPLOAD_REPO=${{ env.PROJECT_NAME }}/${{ github.run_number }}/${{ env.MODE }}" >> $GITHUB_ENV
+            echo "UPLOAD_REPO=${{ env.PROJECT_NAME }}/${{ github.run_number }}/${{ matrix.MODE }}" >> $GITHUB_ENV
           fi
           
       - name: Install dependencies
@@ -52,16 +48,16 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Build ${{ env.PROJECT_NAME }} ${{ env.MODE }}
+      - name: Build ${{ env.PROJECT_NAME }} ${{ matrix.MODE }}
         run: |
-          python build.py ${{ env.BUILD_REPO }} ${{ env.MODE }}
+          python build.py ${{ env.BUILD_REPO }} ${{ matrix.MODE }}
           
       - name: Upload to S3
         #Upload files only if push has tags or the push is made not to the feature/ branches
         if: success() && startsWith(github.ref, 'refs/tags/') || !startsWith(github.ref_name, 'feature/')
         run: |
           #Archiving files
-          (cd ${{ env.BUILD_REPO }} && zip -r ${{ env.BUILD_REPO }}.zip .)
+          (cd ${{ env.BUILD_REPO }} && zip -r "$OLDPWD/${{ env.BUILD_REPO }}.zip" .)
           
           #Upload to S3
           aws s3 cp ${{ env.BUILD_REPO }}.zip s3://${{ env.AWS_BUCKET_NAME }}/${{ env.UPLOAD_REPO }}.zip --region ${{ env.AWS_REGION }}
