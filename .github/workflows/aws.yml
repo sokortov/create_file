@@ -22,8 +22,8 @@ jobs:
       matrix:
         MODE: [DEBUG, RELEASE]
       
-      env:
-        BUILD_REPO: build/${{ matrix.MODE }}
+    env:
+      BUILD_REPO: build/${{ matrix.MODE }}
         
     steps:
       - name: Checkout repository
