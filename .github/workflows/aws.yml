@@ -62,10 +62,10 @@ jobs:
           #Upload to S3
           aws s3 cp ${{ env.BUILD_REPO }}.zip s3://${{ env.AWS_BUCKET_NAME }}/${{ env.UPLOAD_REPO }}.zip --region ${{ env.AWS_REGION }}
       
-#      - name: Clean up working folder
-#        run: |
-#          rm -r -f ${{ env.BUILD_REPO }}
-#          rm -f ${{ env.BUILD_REPO }}.zip
+      - name: Clean up working folder
+        run: |
+          rm -r -f ${{ env.BUILD_REPO }}
+          rm -f ${{ env.BUILD_REPO }}.zip
           
   clean-old-s3-builds:
     name: Clean old builds from S3
