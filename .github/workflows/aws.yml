@@ -10,7 +10,7 @@ env:
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   AWS_REGION: ${{ secrets.AWS_REGION }}
   S3_FOLDER_TO_KEEP: tagged
-  S3_BUILDS_COUNT_TO_KEEP: 2 
+  S3_BUILDS_COUNT_TO_KEEP: 2
   
 jobs:
   run-and-upload:
