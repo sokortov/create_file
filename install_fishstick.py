@@ -15,6 +15,14 @@ def get_fishstick_branches():
         branch = line.split("/")[-1]
         branches.append(branch)
     return branches
+    
+def choose_fishstick_branch():
+    branches = get_fishstick_branches()
+    print("Available branches:")
+    for i, branch in enumerate(branches):
+        print(f"{i}: {branch}")
+    branch_index = int(input("Select branch to clone or update (number): "))
+    return branches[branch_index]
 
 def clone_or_update_fishstick_repo(branch):
     if os.path.exists(FISHSTICK_PATH):
@@ -38,14 +46,6 @@ def download_and_extract_fishstick_dependencies():
         print(f"Files downloaded and extracted to {FISHSTICK_PATH}")
 
 if __name__ == "__main__":
-    branches = get_fishstick_branches()
-    print("Available branches:")
-    for i, branch in enumerate(branches):
-        print(f"{i}: {branch}")
-
-    branch_index = int(input("Select branch to clone or update (number): "))
-    selected_branch = branches[branch_index]
-
-    clone_or_update_fishstick_repo(selected_branch)
-
+    branch = choose_fishstick_branch
+    clone_or_update_fishstick_repo(branch)
     download_and_extract_fishstick_dependencies()
