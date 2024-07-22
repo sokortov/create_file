@@ -16,22 +16,22 @@ def get_fishstick_branches():
         branches.append(branch)
     return branches
 
-def clone_or_update_fishstick_repo(branch, destination):
-    if os.path.exists(destination):
-        print(f"Repository already exists. Updating {destination}")
-        run(["git", "checkout", branch], cwd=destination, check=True)
-        run(["git", "pull", "origin", branch], cwd=destination, check=True)
+def clone_or_update_fishstick_repo(branch):
+    if os.path.exists(FISHSTICK_PATH):
+        print(f"Repository already exists. Updating {FISHSTICK_PATH}")
+        run(["git", "checkout", branch], cwd=FISHSTICK_PATH, check=True)
+        run(["git", "pull", "origin", branch], cwd=FISHSTICK_PATH, check=True)
     else:
-        print(f"Cloning repository to {destination}")
-        run(["git", "clone", "--branch", branch, FISHSTICK_GIT_URL, destination], check=True)
-        run(["git", "lfs", "install"], cwd=destination, check=True)
+        print(f"Cloning repository to {FISHSTICK_PATH}")
+        run(["git", "clone", "--branch", branch, FISHSTICK_GIT_URL, FISHSTICK_PATH], check=True)
+        run(["git", "lfs", "install"], cwd=FISHSTICK_PATH, check=True)
 
-def download_and_extract_s3_files(urls, destination):
-    for url in urls:
-        zip_file_name = os.path.join(destination, url.split('/')[-1])
+def download_and_extract_s3_files():
+    for url in S3_DEPENDENCIES_URLS:
+        zip_file_name = os.path.join(FISHSTICK_PATH, url.split('/')[-1])
         run(["aws", "s3", "cp", url, zip_file_name], check=True)
         with zipfile.ZipFile(zip_file_name, 'r') as zip_ref:
-            zip_ref.extractall(destination)
+            zip_ref.extractall(FISHSTICK_PATH)
         os.remove(zip_file_name)
 
 branches = get_fishstick_branches()
@@ -42,8 +42,8 @@ for i, branch in enumerate(branches):
 branch_index = int(input("Select branch to clone or update (number): "))
 selected_branch = branches[branch_index]
 
-clone_or_update_fishstick_repo(FISHSTICK_GIT_URL, selected_branch, FISHSTICK_PATH)
+clone_or_update_fishstick_repo(selected_branch)
 print(f"Repository cloned or updated to {FISHSTICK_PATH}")
 
-download_and_extract_s3_files(S3_DEPENDENCIES_URLS, FISHSTICK_PATH)
+download_and_extract_fishstick_dependencies()
 print(f"Files downloaded and extracted to {FISHSTICK_PATH}")
