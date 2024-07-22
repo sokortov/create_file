@@ -26,7 +26,7 @@ def clone_or_update_fishstick_repo(branch):
         run(["git", "clone", "--branch", branch, FISHSTICK_GIT_URL, FISHSTICK_PATH], check=True)
         run(["git", "lfs", "install"], cwd=FISHSTICK_PATH, check=True)
 
-def download_and_extract_s3_files():
+def download_and_extract_fishstick_dependencies():
     for url in S3_DEPENDENCIES_URLS:
         zip_file_name = os.path.join(FISHSTICK_PATH, url.split('/')[-1])
         run(["aws", "s3", "cp", url, zip_file_name], check=True)
