@@ -27,19 +27,19 @@ def choose_fishstick_branch():
 def clone_or_update_fishstick_repo(branch):
     if os.path.exists(FISHSTICK_PATH):
         print(f"Repository already exists. Updating {FISHSTICK_PATH}")
-        run(["git", "checkout", branch], cwd=FISHSTICK_PATH, check=True)
-        run(["git", "pull", "origin", branch], cwd=FISHSTICK_PATH, check=True)
+        run(["git", "checkout", branch, FISHSTICK_PATH])
+        run(["git", "pull", "origin", branch, FISHSTICK_PATH])
     else:
         print(f"Cloning repository to {FISHSTICK_PATH}")
-        run(["git", "clone", "--branch", branch, FISHSTICK_GIT_URL, FISHSTICK_PATH], check=True)
-        run(["git", "lfs", "install"], cwd=FISHSTICK_PATH, check=True)
+        run(["git", "clone", "--branch", branch, FISHSTICK_GIT_URL, FISHSTICK_PATH])
+        run(["git", "lfs", "pull", FISHSTICK_PATH])
         
     print(f"Repository cloned or updated to {FISHSTICK_PATH}")
 
 def download_and_extract_fishstick_dependencies():
     for url in S3_DEPENDENCIES_URLS:
         zip_file_name = os.path.join(FISHSTICK_PATH, url.split('/')[-1])
-        run(["aws", "s3", "cp", url, zip_file_name], check=True)
+        run(["aws", "s3", "cp", url, zip_file_name])
         with zipfile.ZipFile(zip_file_name, 'r') as zip_ref:
             zip_ref.extractall(FISHSTICK_PATH)
         os.remove(zip_file_name)
