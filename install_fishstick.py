@@ -25,6 +25,8 @@ def clone_or_update_fishstick_repo(branch):
         print(f"Cloning repository to {FISHSTICK_PATH}")
         run(["git", "clone", "--branch", branch, FISHSTICK_GIT_URL, FISHSTICK_PATH], check=True)
         run(["git", "lfs", "install"], cwd=FISHSTICK_PATH, check=True)
+        
+    print(f"Repository cloned or updated to {FISHSTICK_PATH}")
 
 def download_and_extract_fishstick_dependencies():
     for url in S3_DEPENDENCIES_URLS:
@@ -33,6 +35,7 @@ def download_and_extract_fishstick_dependencies():
         with zipfile.ZipFile(zip_file_name, 'r') as zip_ref:
             zip_ref.extractall(FISHSTICK_PATH)
         os.remove(zip_file_name)
+        print(f"Files downloaded and extracted to {FISHSTICK_PATH}")
 
 branches = get_fishstick_branches()
 print("Available branches:")
@@ -43,7 +46,5 @@ branch_index = int(input("Select branch to clone or update (number): "))
 selected_branch = branches[branch_index]
 
 clone_or_update_fishstick_repo(selected_branch)
-print(f"Repository cloned or updated to {FISHSTICK_PATH}")
 
 download_and_extract_fishstick_dependencies()
-print(f"Files downloaded and extracted to {FISHSTICK_PATH}")
