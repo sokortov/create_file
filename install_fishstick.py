@@ -46,6 +46,6 @@ def download_and_extract_fishstick_dependencies():
         print(f"Files downloaded and extracted to {FISHSTICK_PATH}")
 
 if __name__ == "__main__":
-    branch = choose_fishstick_branch
-    clone_or_update_fishstick_repo(branch)
+    needed_branch = choose_fishstick_branch
+    clone_or_update_fishstick_repo(needed_branch)
     download_and_extract_fishstick_dependencies()
