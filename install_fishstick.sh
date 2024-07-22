@@ -7,31 +7,25 @@ S3_DEPENDENCIES_URLS=(
     "s3://wqerwerwqer/create_file/296/RELEASE.zip"
 )
 
-echo "Клонирование репозитория $FISHSTICK_GIT_URL в папку $FISHSTICK_PATH..."
+echo "Cloning repository $FISHSTICK_GIT_URL into $FISHSTICK_PATH..."
 git clone "$FISHSTICK_GIT_URL" "$FISHSTICK_PATH"
 
-echo "Доступные ветки:"
+cd "$FISHSTICK_PATH" || exit
+
+echo "Available branches:"
 git branch -r
-echo "Введите имя ветки для клонирования:"
+echo "Enter the branch name to clone:"
 read -r BRANCH_NAME
 
 git checkout "$BRANCH_NAME"
 
-# Скачивание и распаковка файлов
+# Download and extract files
 for s3_url in "${S3_DEPENDENCIES_URLS[@]}"; do
     file_name=$(basename "$s3_url")
-    echo "Скачивание $file_name из S3..."
-    if ! aws s3 cp "$s3_url" .; then
-        echo "Ошибка при скачивании $file_name"
-        continue
-    fi
-    echo "Распаковка $file_name..."
-    if ! unzip -o "$file_name" -d .; then
-        echo "Ошибка при распаковке $file_name. Возможно, файл поврежден или не является архивом."
-    else
-        echo "Удаление архива $file_name..."
-        rm "$file_name"
-    fi
+    echo "Downloading $file_name from S3..."
+    aws s3 cp "$s3_url" .
+    unzip -o "$file_name" -d $FISHSTICK_PATH
+    rm "$file_name"
 done
 
-echo "Скрипт завершен."
+echo "Script completed."
