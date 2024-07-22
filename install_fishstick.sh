@@ -18,10 +18,10 @@ read -r BRANCH_NAME
 git checkout "$BRANCH_NAME"
 
 # Скачивание и распаковка файлов
-for s3_url in "${files[@]}"; do
-    file_name=$(basename "$S3_DEPENDENCIES_URLS")
+for s3_url in "${S3_DEPENDENCIES_URLS[@]}"; do
+    file_name=$(basename "$s3_url")
     echo "Скачивание $file_name из S3..."
-    if ! aws s3 cp "$S3_DEPENDENCIES_URLS" .; then
+    if ! aws s3 cp "$s3_url" .; then
         echo "Ошибка при скачивании $file_name"
         continue
     fi
