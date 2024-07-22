@@ -2,8 +2,8 @@
 
 FISHSTICK_PATH="$HOME/Downloads/fishstick-blackband"
 FISHSTICK_GIT_URL="https://github.com/Eyelights/fishstick-blackband"
-S3_DEPENDENCIES_URLS = (
-    "s3://wqerwerwqer/create_file/296/DEBUG.zip",
+S3_DEPENDENCIES_URLS=(
+    "s3://wqerwerwqer/create_file/296/DEBUG.zip"
     "s3://wqerwerwqer/create_file/296/RELEASE.zip"
 )
 
