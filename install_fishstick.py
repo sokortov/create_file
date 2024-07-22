@@ -37,14 +37,15 @@ def download_and_extract_fishstick_dependencies():
         os.remove(zip_file_name)
         print(f"Files downloaded and extracted to {FISHSTICK_PATH}")
 
-branches = get_fishstick_branches()
-print("Available branches:")
-for i, branch in enumerate(branches):
-    print(f"{i}: {branch}")
+if __name__ == "__main__":
+    branches = get_fishstick_branches()
+    print("Available branches:")
+    for i, branch in enumerate(branches):
+        print(f"{i}: {branch}")
 
-branch_index = int(input("Select branch to clone or update (number): "))
-selected_branch = branches[branch_index]
+    branch_index = int(input("Select branch to clone or update (number): "))
+    selected_branch = branches[branch_index]
 
-clone_or_update_fishstick_repo(selected_branch)
+    clone_or_update_fishstick_repo(selected_branch)
 
-download_and_extract_fishstick_dependencies()
+    download_and_extract_fishstick_dependencies()
