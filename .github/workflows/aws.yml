@@ -51,53 +51,53 @@ jobs:
           else
             echo "UPLOAD_REPO=${{ env.PROJECT_NAME }}/${{ github.run_number }}/${{ matrix.MODE }}" >> $GITHUB_ENV
           fi
-      
-      - name: Upload to S3
-        #Upload files only if push has tags or the push is made not to the feature/ branches
-        if: success() && startsWith(github.ref, 'refs/tags/') || !startsWith(github.ref_name, 'feature/')
-        run: |
-          #Archiving files
-          (cd ${{ env.BUILD_REPO }} && zip -r "$OLDPWD/${{ env.BUILD_REPO }}.zip" .)
-          
-          #Upload to S3
-          aws s3 cp ${{ env.BUILD_REPO }}.zip s3://${{ env.AWS_BUCKET_NAME }}/${{ env.UPLOAD_REPO }}.zip --region ${{ env.AWS_REGION }}
+#      
+#      - name: Upload to S3
+#        #Upload files only if push has tags or the push is made not to the feature/ branches
+#        if: success() && startsWith(github.ref, 'refs/tags/') || !startsWith(github.ref_name, 'feature/')
+#        run: |
+#          #Archiving files
+#          (cd ${{ env.BUILD_REPO }} && zip -r "$OLDPWD/${{ env.BUILD_REPO }}.zip" .)
+#          
+#          #Upload to S3
+#          aws s3 cp ${{ env.BUILD_REPO }}.zip s3://${{ env.AWS_BUCKET_NAME }}/${{ env.UPLOAD_REPO }}.zip --region ${{ env.AWS_REGION }}
       
       - name: Clean up working folder
         run: |
           rm -r -f ${{ env.BUILD_REPO }}
           rm -f ${{ env.BUILD_REPO }}.zip
-          
-  clean-old-s3-builds:
-    name: Clean old builds from S3
-    
-    needs: run-and-upload
-    
-    runs-on: self-hosted
-    
-    steps:
-      - name: Clean old builds from S3
-        run: |
-          # Retrieve a list of folders in the specified bucket and project prefix.
-          folder_list=$(aws s3api list-objects-v2 \
-                          --bucket ${{ env.AWS_BUCKET_NAME }} \
-                          --prefix ${{ env.PROJECT_NAME }}/ \
-                          --delimiter '/' \
-                          --query "CommonPrefixes[?Prefix != \`${{ env.PROJECT_NAME }}/${{ env.S3_FOLDER_TO_KEEP }}/\`].Prefix" \
-                          --output text)
-
-          # Iterate through each folder to find the latest date and time of its contents.
-          folders_with_dates=$(for folder in $folder_list; do
-                                echo "$(aws s3 ls s3://${{ env.AWS_BUCKET_NAME }}/$folder --recursive | sort | tail -n 1) $folder"
-                              done)
-
-          # Sort folders based on the latest date and time.
-          sorted_folders=$(echo "$folders_with_dates" | sort | awk '{print $NF}')
-          folder_array=($sorted_folders)
-
-          # Determine the number of folders to delete based on the configured count to keep.
-          folders_to_delete=("${folder_array[@]:0:${#folder_array[@]}-${{ env.S3_BUILDS_COUNT_TO_KEEP }}}")
-
-          # Delete the identified folders and their contents from the S3 bucket.
-          for folder in "${folders_to_delete[@]}"; do
-            aws s3 rm "s3://${{ env.AWS_BUCKET_NAME }}/$folder" --recursive
-          done
+#          
+#  clean-old-s3-builds:
+#    name: Clean old builds from S3
+#    
+#    needs: run-and-upload
+#    
+#    runs-on: self-hosted
+#    
+#    steps:
+#      - name: Clean old builds from S3
+#        run: |
+#          # Retrieve a list of folders in the specified bucket and project prefix.
+#          folder_list=$(aws s3api list-objects-v2 \
+#                          --bucket ${{ env.AWS_BUCKET_NAME }} \
+#                          --prefix ${{ env.PROJECT_NAME }}/ \
+#                          --delimiter '/' \
+#                          --query "CommonPrefixes[?Prefix != \`${{ env.PROJECT_NAME }}/${{ env.S3_FOLDER_TO_KEEP }}/\`].Prefix" \
+#                          --output text)
+#
+#          # Iterate through each folder to find the latest date and time of its contents.
+#          folders_with_dates=$(for folder in $folder_list; do
+#                                echo "$(aws s3 ls s3://${{ env.AWS_BUCKET_NAME }}/$folder --recursive | sort | tail -n 1) $folder"
+#                              done)
+#
+#          # Sort folders based on the latest date and time.
+#          sorted_folders=$(echo "$folders_with_dates" | sort | awk '{print $NF}')
+#          folder_array=($sorted_folders)
+#
+#          # Determine the number of folders to delete based on the configured count to keep.
+#          folders_to_delete=("${folder_array[@]:0:${#folder_array[@]}-${{ env.S3_BUILDS_COUNT_TO_KEEP }}}")
+#
+#          # Delete the identified folders and their contents from the S3 bucket.
+#          for folder in "${folders_to_delete[@]}"; do
+#            aws s3 rm "s3://${{ env.AWS_BUCKET_NAME }}/$folder" --recursive
+#          done
