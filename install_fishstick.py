@@ -42,7 +42,8 @@ def download_and_extract_fishstick_dependencies():
         with zipfile.ZipFile(zip_file_name, 'r') as zip_ref:
             zip_ref.extractall(FISHSTICK_PATH)
         os.remove(zip_file_name)
-        print(f"Files downloaded and extracted to {FISHSTICK_PATH}")
+    
+    print(f"Files downloaded and extracted to {FISHSTICK_PATH}")
 
 if __name__ == "__main__":
     needed_fishstick_branch = choose_fishstick_branch()
