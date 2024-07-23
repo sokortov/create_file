@@ -1,7 +1,7 @@
 #!/bin/bash
 
 FISHSTICK_PATH="~/Downloads/fishstick-blackband"
-FISHSTICK_GIT_URL="https://github.com/Eyelights/fishstick-blackband"
+FISHSTICK_GIT_URL="git@github.com:Eyelights/fishstick-blackband.git"
 S3_DEPENDENCIES_URLS=(
     "s3://wqerwerwqer/create_file/296/DEBUG.zip"
     "s3://wqerwerwqer/create_file/296/RELEASE.zip"
