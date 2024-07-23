@@ -23,12 +23,12 @@ else
 fi
 
 # Download and extract files
-for s3_url in "${S3_DEPENDENCIES_URLS[@]}"; do
+for s3_url in ${S3_DEPENDENCIES_URLS[@]}; do
     file_name=$(basename "$s3_url")
     echo "Downloading $file_name from S3..."
-    aws s3 cp "$s3_url" .
-    unzip -o "$file_name" -d $FISHSTICK_PATH
-    rm "$file_name"
+    aws s3 cp $s3_url .
+    unzip -o $file_name -d $FISHSTICK_PATH
+    rm $file_name
 done
 
 echo "Script completed."
