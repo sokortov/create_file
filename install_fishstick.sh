@@ -18,7 +18,7 @@ if [ -d $FISHSTICK_PATH ]; then
     git -C $FISHSTICK_PATH pull origin $BRANCH_NAME
 else
     echo "Cloning repository to $FISHSTICK_PATH"
-    git clone --branch $BRANCH_NAME $FISHSTICK_GIT_URL $FISHSTICK_PAT
+    git clone --branch $BRANCH_NAME $FISHSTICK_GIT_URL $FISHSTICK_PATH
     git -C $FISHSTICK_PATH lfs pull
 fi
 
