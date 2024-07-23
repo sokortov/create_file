@@ -1,14 +1,14 @@
 #!/bin/bash
 
-FISHSTICK_PATH="~/Downloads/fishstick-blackband"
-FISHSTICK_GIT_URL="git@github.com:Eyelights/fishstick-blackband.git"
-S3_DEPENDENCIES_URLS=(
-    "s3://wqerwerwqer/create_file/296/DEBUG.zip"
-    "s3://wqerwerwqer/create_file/296/RELEASE.zip"
+export FISHSTICK_PATH=~/Downloads/fishstick-blackband
+export FISHSTICK_GIT_URL=git@github.com:Eyelights/fishstick-blackband.git
+export S3_DEPENDENCIES_URLS=(
+    s3://wqerwerwqer/create_file/296/DEBUG.zip
+    s3://wqerwerwqer/create_file/296/RELEASE.zip
 )
 
 echo "Select needed branch. Available branches:"
-git ls-remote --heads "$FISHSTICK_GIT_URL" | awk '{print $2}' | sed 's|refs/heads/||'
+git ls-remote --heads $FISHSTICK_GIT_URL | awk '{print $2}' | sed 's|refs/heads/||'
 echo "Enter the branch name to clone:"
 read -r BRANCH_NAME
 
