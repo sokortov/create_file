@@ -8,7 +8,7 @@ S3_DEPENDENCIES_URLS=(
 )
 
 echo "Select needed branch. Available branches:"
-git ls-remote --heads $FISHSTICK_PATH
+git ls-remote --heads "$FISHSTICK_GIT_URL" | awk '{print $2}' | sed 's|refs/heads/||'
 echo "Enter the branch name to clone:"
 read -r BRANCH_NAME
 
