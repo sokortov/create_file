@@ -14,12 +14,12 @@ read -r BRANCH_NAME
 
 if [ -d $FISHSTICK_PATH ]; then
     echo "Repository already exists. Updating $FISHSTICK_PATH"
-    git checkout $BRANCH_NAME $FISHSTICK_PATH
-    git pull origin $BRANCH_NAME $FISHSTICK_PATH
+    git -С $FISHSTICK_PATH checkout $BRANCH_NAME
+    git -С $FISHSTICK_PATH pull origin $BRANCH_NAME
 else
     echo "Cloning repository to $FISHSTICK_PATH"
     git clone --branch $BRANCH_NAME $FISHSTICK_GIT_URL $FISHSTICK_PAT
-    git lfs pull $FISHSTICK_PATH
+    git -С $FISHSTICK_PATH lfs pull
 fi
 
 # Download and extract files

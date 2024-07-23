@@ -1,4 +1,6 @@
-import os, subprocess, zipfile
+import os
+import subprocess
+import zipfile
 from subprocess import run
 
 FISHSTICK_PATH = os.path.expanduser("~/Downloads/fishstick-blackband")
@@ -10,12 +12,9 @@ S3_DEPENDENCIES_URLS = [
 
 def get_fishstick_branches():
     result = run(["git", "ls-remote", "--heads", FISHSTICK_GIT_URL], capture_output=True, text=True)
-    branches = []
-    for line in result.stdout.splitlines():
-        branch = line.split("/")[-1]
-        branches.append(branch)
+    branches = [line.split("/")[-1] for line in result.stdout.splitlines()]
     return branches
-    
+
 def choose_fishstick_branch():
     branches = get_fishstick_branches()
     print("Available branches:")
@@ -27,18 +26,18 @@ def choose_fishstick_branch():
 def clone_or_update_fishstick_repo(branch):
     if os.path.exists(FISHSTICK_PATH):
         print(f"Repository already exists. Updating {FISHSTICK_PATH}")
-        run(["git", "checkout", branch, FISHSTICK_PATH])
-        run(["git", "pull", "origin", branch, FISHSTICK_PATH])
+        run(["git", "-C", FISHSTICK_PATH, "checkout", branch])
+        run(["git", "-C", FISHSTICK_PATH, "pull", "origin", branch])
     else:
         print(f"Cloning repository to {FISHSTICK_PATH}")
         run(["git", "clone", "--branch", branch, FISHSTICK_GIT_URL, FISHSTICK_PATH])
-        run(["git", "lfs", "pull", FISHSTICK_PATH])
-        
+        run(["git", "-C", FISHSTICK_PATH, "lfs", "pull"])
+
     print(f"Repository cloned or updated to {FISHSTICK_PATH}")
 
 def download_and_extract_fishstick_dependencies():
     for url in S3_DEPENDENCIES_URLS:
-        zip_file_name = os.path.join(FISHSTICK_PATH, url.split('/')[-1])
+        zip_file_name = os.path.join(FISHSTICK_PATH, os.path.basename(url))
         run(["aws", "s3", "cp", url, zip_file_name])
         with zipfile.ZipFile(zip_file_name, 'r') as zip_ref:
             zip_ref.extractall(FISHSTICK_PATH)
