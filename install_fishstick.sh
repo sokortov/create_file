@@ -1,15 +1,23 @@
 #!/bin/bash
 
-export fishstick_build_path=~/Downloads/fishstick-blackband
-export fishstick_install_path=~/Desktop/fishstick-install
 export fishstick_git_url=git@github.com:Eyelights/fishstick-blackband.git
+export fishstick_build_path=~/Downloads/fishstick-blackband
+export fishstick_install_path=~/Documents/fishstick-install
+
+export fishstick_executable_path=${fishstick_install_path}/fishstick_core.arm64
+export fishstick_service_name=fishstick_core
+export fishstick_service_path=/etc/systemd/system/${service_name}.service
+
+export gd_eye_i_version=5
+export gd_eye_recognizer_version=3
+export gd_eye_stttts_version=11
 export s3_dependencies_urls=(
-    s3://eyelights-computer-vision/gd-eye-I/5/DEBUG.zip
-    s3://eyelights-computer-vision/gd-eye-I/5/RELEASE.zip
-    s3://eyelights-computer-vision/gd-eye-recognizer/3/DEBUG.zip
-    s3://eyelights-computer-vision/gd-eye-recognizer/3/RELEASE.zip
-    s3://eyelights-computer-vision/gd-eye-stttts/11/DEBUG.zip
-    s3://eyelights-computer-vision/gd-eye-stttts/11/RELEASE.zip
+    s3://eyelights-computer-vision/gd-eye-I/${gd_eye_i_version}/DEBUG.zip
+    s3://eyelights-computer-vision/gd-eye-I/${gd_eye_i_version}/RELEASE.zip
+    s3://eyelights-computer-vision/gd-eye-recognizer/${gd_eye_recognizer_version}/DEBUG.zip
+    s3://eyelights-computer-vision/gd-eye-recognizer/${gd_eye_recognizer_version}/RELEASE.zip
+    s3://eyelights-computer-vision/gd-eye-stttts/${gd_eye_stttts_version}/DEBUG.zip
+    s3://eyelights-computer-vision/gd-eye-stttts/${gd_eye_stttts_version}/RELEASE.zip
 )
 
 echo "Select needed branch. Available branches:"
@@ -37,5 +45,26 @@ done
 
 echo "Export godot project"
 mkdir ${fishstick_install_path}
-godot --headless --export-release "Linux/X11" ${fishstick_build_path}/project.godot ${fishstick_install_path}/fishstick_core.arm64
+godot --headless --export-release "Linux/X11" ${fishstick_build_path}/project.godot ${fishstick_executable_path}
 cp -rf ${fishstick_build_path}/bin/* ${fishstick_install_path}
+cp -rf ${fishstick_build_path}/blackband ${fishstick_install_path}
+
+echo "Create fishstick service"
+sudo bash -c "cat > ${fishstick_service_path}" <<EOF
+[Unit]
+Description=Fishstick Core Service
+After=network.target
+
+[Service]
+ExecStartPre=/bin/sleep 5
+ExecStart=${fishstick_executable_path}
+Restart=always
+User=$(whoami)
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+sudo systemctl daemon-reload
+sudo systemctl enable ${fishstick_service_name}
+sudo systemctl start ${fishstick_service_name}
