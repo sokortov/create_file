@@ -1,7 +1,7 @@
 #!/bin/bash
 
 export fishstick_build_path=~/Downloads/fishstick-blackband
-export fishstick_install_path=~/Desktop/fstkb
+export fishstick_install_path=~/Desktop/fishstick-install
 export fishstick_git_url=git@github.com:Eyelights/fishstick-blackband.git
 export s3_dependencies_urls=(
     s3://eyelights-computer-vision/gd-eye-I/5/DEBUG.zip
@@ -36,4 +36,6 @@ for s3_url in ${s3_dependencies_urls[@]}; do
 done
 
 echo "Export godot project"
+mkdir ${fishstick_install_path}
 godot --headless --export-release "Linux/X11" ${fishstick_build_path}/project.godot ${fishstick_install_path}/fishstick_core.arm64
+cp -rf ${fishstick_build_path}/bin/* ${fishstick_install_path}
