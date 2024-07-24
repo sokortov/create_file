@@ -1,8 +1,9 @@
 #!/bin/bash
 
-export FISHSTICK_PATH=~/Downloads/fishstick-blackband
-export FISHSTICK_GIT_URL=git@github.com:Eyelights/fishstick-blackband.git
-export S3_DEPENDENCIES_URLS=(
+export fishstick_build_path=~/Downloads/fishstick-blackband
+export fishstick_install_path=~/Desktop/fstkb
+export fishstick_git_url=git@github.com:Eyelights/fishstick-blackband.git
+export s3_dependencies_urls=(
     s3://eyelights-computer-vision/gd-eye-I/5/DEBUG.zip
     s3://eyelights-computer-vision/gd-eye-I/5/RELEASE.zip
     s3://eyelights-computer-vision/gd-eye-recognizer/3/DEBUG.zip
@@ -12,26 +13,27 @@ export S3_DEPENDENCIES_URLS=(
 )
 
 echo "Select needed branch. Available branches:"
-git ls-remote --heads $FISHSTICK_GIT_URL | awk '{print $2}' | sed 's|refs/heads/||'
+git ls-remote --heads ${fishstick_git_url} | awk '{print $2}' | sed 's|refs/heads/||'
 echo "Enter the branch name to clone:"
-read -r BRANCH_NAME
+read -r branch_name
 
-if [ -d $FISHSTICK_PATH ]; then
-    echo "Repository already exists. Updating $FISHSTICK_PATH"
-    git -C $FISHSTICK_PATH checkout $BRANCH_NAME
-    git -C $FISHSTICK_PATH pull origin $BRANCH_NAME
+if [ -d ${fishstick_build_path} ]; then
+    echo "Repository already exists. Updating ${fishstick_build_path}"
+    git -C ${fishstick_build_path} checkout ${branch_name}
+    git -C ${fishstick_build_path} pull origin ${branch_name}
 else
-    echo "Cloning repository to $FISHSTICK_PATH"
-    git clone --branch $BRANCH_NAME $FISHSTICK_GIT_URL $FISHSTICK_PATH
-    git -C $FISHSTICK_PATH lfs pull
+    echo "Cloning repository to ${fishstick_build_path}"
+    git clone --branch ${branch_name} ${fishstick_git_url} ${fishstick_build_path}
+    git -C ${fishstick_build_path} lfs pull
 fi
 
 echo "Downloading files from S3..."
-for s3_url in ${S3_DEPENDENCIES_URLS[@]}; do
+for s3_url in ${s3_dependencies_urls[@]}; do
     file_name=$(basename "$s3_url")
     aws s3 cp $s3_url .
-    unzip -o $file_name -d $FISHSTICK_PATH
+    unzip -o $file_name -d ${fishstick_build_path}
     rm $file_name
 done
 
-echo "Script completed."
+echo "Export godot project"
+godot --headless --export-release "Linux/X11" ${fishstick_build_path}/project.godot ${fishstick_install_path}/fishstick_core.arm64
