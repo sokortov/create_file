@@ -52,8 +52,8 @@ fi
 
 echo "Create start fishstick script"
 echo -e "#!/bin/bash
-export LD_LIBRARY_PATH=n${fishstick_executable_path}
-cd \$LD_LIBRARY_PATH && sleep 5 && \$LD_LIBRARY_PATH/CarBrain" > ${fishstick_start_script_path}
+export LD_LIBRARY_PATH=${fishstick_executable_path}
+cd \$LD_LIBRARY_PATH && sleep 5 && \$LD_LIBRARY_PATH" > ${fishstick_start_script_path}
 chmod +x ${fishstick_start_script_path}
 
 echo "Create autorun file"
