@@ -6,7 +6,7 @@ export fishstick_install_path=~/Documents/fishstick-install
 
 export fishstick_executable_path=${fishstick_install_path}/fishstick_core.arm64
 export fishstick_service_name=fishstick_core
-export fishstick_service_path=/etc/systemd/system/${service_name}.service
+export fishstick_service_path=/etc/systemd/system/${fishstick_service_name}.service
 
 export gd_eye_i_version=5
 export gd_eye_recognizer_version=3
