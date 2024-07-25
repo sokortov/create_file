@@ -36,40 +36,42 @@ else
     git -C ${fishstick_build_path} lfs pull
 fi
 
-echo "Downloading files from S3..."
-for s3_url in ${s3_dependencies_urls[@]}; do
-    file_name=$(basename "$s3_url")
-    aws s3 cp $s3_url .
-    unzip -o $file_name -d ${fishstick_build_path}
-    rm $file_name
-done
+#echo "Downloading files from S3..."
+#for s3_url in ${s3_dependencies_urls[@]}; do
+#    file_name=$(basename "$s3_url")
+#    aws s3 cp $s3_url .
+#    unzip -o $file_name -d ${fishstick_build_path}
+#    rm $file_name
+#done
 
-echo "Export godot project"
-mkdir ${fishstick_install_path}
-godot --headless --export-release "Linux/X11" ${fishstick_build_path}/project.godot ${fishstick_executable_path}
-cp -rf ${fishstick_build_path}/bin/* ${fishstick_install_path}
-cp -rf ${fishstick_build_path}/blackband ${fishstick_install_path}
+#echo "Export godot project"
+#mkdir ${fishstick_install_path}
+#godot --headless --export-release "Linux/X11" ${fishstick_build_path}/project.godot ${fishstick_executable_path}
+#cp -rf ${fishstick_build_path}/bin/* ${fishstick_install_path}
+#cp -rf ${fishstick_build_path}/blackband ${fishstick_install_path}
 
 echo "Create start fishstick script"
-echo -e "#!/bin/bash\nsleep 5\n${fishstick_executable_path}" > ${fishstick_start_script_path}
+echo -e "#!/bin/bash
+export LD_LIBRARY_PATH=n${fishstick_executable_path}
+cd \$LD_LIBRARY_PATH && sleep 5 && \$LD_LIBRARY_PATH/CarBrain" > ${fishstick_start_script_path}
 chmod +x ${fishstick_start_script_path}
 
-echo "Create fishstick service"
-sudo bash -c "cat > ${fishstick_service_path}" <<EOF
-[Unit]
-Description=Fishstick Core Service
-After=network.target
-
-[Service]
-ExecStartPre=/bin/sleep 5
-ExecStart=${fishstick_start_script_path}
-Restart=always
-User=$(whoami)
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-sudo systemctl daemon-reload
-sudo systemctl enable ${fishstick_service_name}
-sudo systemctl start ${fishstick_service_name}
+echo "Create autorun file"
+#sudo bash -c "cat > ${fishstick_service_path}" <<EOF
+#[Unit]
+#Description=Fishstick Core Service
+#After=network.target
+#
+#[Service]
+#ExecStartPre=/bin/sleep 5
+#ExecStart=${fishstick_start_script_path}
+#Restart=always
+#User=$(whoami)
+#
+#[Install]
+#WantedBy=multi-user.target
+#EOF
+#
+#sudo systemctl daemon-reload
+#sudo systemctl enable ${fishstick_service_name}
+#sudo systemctl start ${fishstick_service_name}
