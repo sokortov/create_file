@@ -5,6 +5,7 @@ export fishstick_build_path=~/Downloads/fishstick-blackband
 export fishstick_install_path=~/Documents/fishstick-install
 
 export fishstick_executable_path=${fishstick_install_path}/fishstick_core.arm64
+export fishstick_start_script_path=${fishstick_install_path}/start_fishstick.sh
 export fishstick_service_name=fishstick_core
 export fishstick_service_path=/etc/systemd/system/${fishstick_service_name}.service
 
@@ -49,6 +50,10 @@ godot --headless --export-release "Linux/X11" ${fishstick_build_path}/project.go
 cp -rf ${fishstick_build_path}/bin/* ${fishstick_install_path}
 cp -rf ${fishstick_build_path}/blackband ${fishstick_install_path}
 
+echo "Create start fishstick script"
+echo -e "#!/bin/bash\nsleep 5\n${fishstick_executable_path}" > ${fishstick_start_script_path}
+chmod +x ${fishstick_start_script_path}
+
 echo "Create fishstick service"
 sudo bash -c "cat > ${fishstick_service_path}" <<EOF
 [Unit]
@@ -57,7 +62,7 @@ After=network.target
 
 [Service]
 ExecStartPre=/bin/sleep 5
-ExecStart=${fishstick_executable_path}
+ExecStart=${fishstick_start_script_path}
 Restart=always
 User=$(whoami)
 
