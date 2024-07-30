@@ -22,7 +22,7 @@ else
 fi
 
 echo "Install chatsaw"
-(cd ${chatsaw_build_path} && go build ${chatsaw_build_path}/sources/application.go
+(cd ${chatsaw_build_path} && go build ${chatsaw_build_path}/sources/application.go)
 mkdir -p ${chatsaw_install_path}
 cp -rf ${chatsaw_build_path}/sources/application ${chatsaw_install_path}
 
@@ -46,6 +46,6 @@ else
 fi
 
 echo "Install chatsaw-console"
-(cd ${chatsaw_console_build_path} && go build ${chatsaw_console_build_path}/sources/application.go
+(cd ${chatsaw_console_build_path} && go build ${chatsaw_console_build_path}/sources/application.go)
 mkdir -p ${chatsaw_console_install_path}
 cp -rf ${chatsaw_console_build_path}/main ${chatsaw_console_install_path}
