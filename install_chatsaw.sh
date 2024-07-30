@@ -33,7 +33,7 @@ cat > ${chatsaw_autorun_file_path} <<EOF
 [Desktop Entry]
 Type=Application
 Exec=bash -c 'sleep 5; ${chatsaw_executable_path}'
-Name=chatsaw Core
+Name=Chatsaw
 EOF
 
 echo "Download chatsaw-console"
