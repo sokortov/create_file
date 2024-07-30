@@ -10,6 +10,7 @@ export chatsaw_autorun_file_path=${autorun_dir}/chatsaw.desktop
 export chatsaw_console_git_url=git@github.com:Eyelights/chatsaw-console.git
 export chatsaw_console_build_path=~/Downloads/chatsaw-console
 export chatsaw_console_install_path=~/Documents/chatsaw-console-install
+export start_chatsaw_console_file=${chatsaw_console_install_path}/start.sh
 
 echo "Download chatsaw"
 if [ -d ${chatsaw_build_path} ]; then
@@ -49,3 +50,5 @@ echo "Install chatsaw-console"
 (cd ${chatsaw_console_build_path} && go build ${chatsaw_console_build_path}/main.go)
 mkdir -p ${chatsaw_console_install_path}
 cp -rf ${chatsaw_console_build_path}/main ${chatsaw_console_install_path}
+echo "./main ws://127.0.0.1:5000/api/chatsaw-console/socket-notify" > ${start_chatsaw_console_file}
+chmod +x ${start_chatsaw_console_file}
