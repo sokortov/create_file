@@ -53,3 +53,4 @@ if __name__ == "__main__":
     
     # Создание текстового файла 
     create_text_file(args.directory, args.mode)
+ 
